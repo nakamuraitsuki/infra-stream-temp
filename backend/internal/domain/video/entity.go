@@ -11,8 +11,8 @@ import (
 type Video struct {
 	id            uuid.UUID
 	ownerID       uuid.UUID
-	sourceKey     string
-	streamKey     string
+	sourceKey     string // 元動画の保存先キー
+	streamKey     string // 配信・再生用動画の保存先キー
 	status        value.Status
 	title         string
 	description   string
