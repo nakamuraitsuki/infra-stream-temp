@@ -4,22 +4,22 @@ import (
 	"context"
 	"time"
 
-	"example.com/m/internal/domain/user"
+	domain "example.com/m/internal/domain/user"
 	"example.com/m/internal/domain/user/value"
 	"github.com/google/uuid"
 )
 
 type UseCase interface {
-	Register(ctx context.Context, name string, bio string) (*user.User, error)
+	Register(ctx context.Context, name string, bio string) (*domain.User, error)
 	UpdateProfile(ctx context.Context, id uuid.UUID, name string, bio string) error
 	UpdateIcon(ctx context.Context, id uuid.UUID, iconKey *string) error
 }
 
 type UserUseCase struct {
-	repo user.Repository
+	repo domain.Repository
 }
 
-func NewUserUseCase(repo user.Repository) *UserUseCase {
+func NewUserUseCase(repo domain.Repository) *UserUseCase {
 	return &UserUseCase{
 		repo: repo,
 	}
@@ -29,9 +29,9 @@ func (uc *UserUseCase) Register(
 	ctx context.Context,
 	name string,
 	bio string,
-) (*user.User, error) {
+) (*domain.User, error) {
 
-	user :=  user.NewUser(
+	user :=  domain.NewUser(
 		uuid.New(),
 		name,
 		bio,
