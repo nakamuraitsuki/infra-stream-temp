@@ -9,19 +9,21 @@ import (
 	"github.com/google/uuid"
 )
 
-type UseCase interface {
+type UserUseCaseInterface interface {
 	Register(ctx context.Context, name string, bio string) (*domain.User, error)
 	UpdateProfile(ctx context.Context, id uuid.UUID, name string, bio string) error
-	UpdateIcon(ctx context.Context, id uuid.UUID, iconKey *string) error
+	UpdateIcon(ctx context.Context, id uuid.UUID, data []byte) error
 }
 
 type UserUseCase struct {
-	repo domain.Repository
+	repo        domain.Repository
+	iconStorage domain.IconStorage
 }
 
-func NewUserUseCase(repo domain.Repository) *UserUseCase {
+func NewUserUseCase(repo domain.Repository, iconStorage domain.IconStorage) UserUseCaseInterface {
 	return &UserUseCase{
-		repo: repo,
+		repo:        repo,
+		iconStorage: iconStorage,
 	}
 }
 
@@ -31,7 +33,7 @@ func (uc *UserUseCase) Register(
 	bio string,
 ) (*domain.User, error) {
 
-	user :=  domain.NewUser(
+	user := domain.NewUser(
 		uuid.New(),
 		name,
 		bio,
@@ -69,7 +71,7 @@ func (uc *UserUseCase) UpdateProfile(
 func (uc *UserUseCase) UpdateIcon(
 	ctx context.Context,
 	id uuid.UUID,
-	iconKey *string,
+	data []byte,
 ) error {
 
 	user, err := uc.repo.FindByID(ctx, id)
@@ -77,7 +79,13 @@ func (uc *UserUseCase) UpdateIcon(
 		return err
 	}
 
-	user.UpdateIcon(iconKey)
+	key := "icons/" + uuid.New().String() + ".png"
+
+	if err := uc.iconStorage.Upload(ctx, key, data); err != nil {
+		return err
+	}
+
+	user.UpdateIcon(&key)
 
 	return uc.repo.Save(ctx, user)
 }
