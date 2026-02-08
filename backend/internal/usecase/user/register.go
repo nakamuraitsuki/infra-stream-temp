@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	domain "example.com/m/internal/domain/user"
+	"example.com/m/internal/domain/user"
 	"example.com/m/internal/domain/user/value"
 	"github.com/google/uuid"
 )
@@ -13,9 +13,9 @@ func (uc *UserUseCase) Register(
 	ctx context.Context,
 	name string,
 	bio string,
-) (*domain.User, error) {
+) (*user.User, error) {
 
-	user := domain.NewUser(
+	user := user.NewUser(
 		uuid.New(),
 		name,
 		bio,
