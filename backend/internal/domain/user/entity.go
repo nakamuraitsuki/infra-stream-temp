@@ -3,7 +3,7 @@ package user
 import (
 	"time"
 
-	"example.com/m/internal/user/value"
+	"example.com/m/internal/domain/user/value"
 	"github.com/google/uuid"
 )
 
