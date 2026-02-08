@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"example.com/m/internal/domain/video/value"
+	"github.com/google/uuid"
 )
 
 type Video struct {
-	id            string
-	ownerID       string
+	id            uuid.UUID
+	ownerID       uuid.UUID
 	sourceKey     string
 	streamKey     string
 	status        value.Status
