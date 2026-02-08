@@ -1,6 +1,7 @@
 package video
 
 import (
+	"errors"
 	"time"
 
 	"example.com/m/internal/domain/video/value"
@@ -46,4 +47,24 @@ func NewVideo(
 		visibility:  visibility,
 		createdAt:   createdAt,
 	}
+}
+
+func (v *Video) StartTranscoding() error {
+	if v.status != value.StatusUploaded {
+		return errors.New("video is not transcodable")
+	}
+	v.status = value.StatusProcessing
+	return nil
+}
+
+func (v *Video) MarkTranscodeSucceeded() {
+	v.status = value.StatusReady
+	v.failureReason = nil
+	v.retryCount = 0
+}
+
+func (v *Video) MarkTranscodeFailed(reason value.FailureReason) {
+	v.status = value.StatusFailed
+	v.failureReason = &reason
+	v.retryCount++
 }
