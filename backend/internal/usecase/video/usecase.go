@@ -10,7 +10,7 @@ import (
 )
 
 type VideoUseCaseInterface interface {
-	// Create uploads a new video.
+	// Create uploads a new video meta data. (not the raw video data)
 	Create(
 		ctx context.Context,
 		ownerID uuid.UUID,
@@ -21,6 +21,12 @@ type VideoUseCaseInterface interface {
 		visibility video_value.Visibility,
 	) (*video_domain.Video, error)
 
+	// UploadSource uploads the raw video data for the specified video.
+	UploadSource(ctx context.Context, videoID uuid.UUID, videoData io.Reader) error
+
+	// StartTranscoding initiates the transcoding process for a video.
+	StartTranscoding(ctx context.Context, videoID uuid.UUID, streamKey string) error
+
 	// ListMine returns a list of videos owned by the specified user.
 	ListMine(ctx context.Context, ownerID uuid.UUID, query VideoSearchQuery) ([]*video_domain.Video, error)
 
@@ -29,9 +35,6 @@ type VideoUseCaseInterface interface {
 
 	// SearchByTag returns a list of videos matching the specified tag.
 	SearchByTag(ctx context.Context, tag video_value.Tag, query VideoSearchQuery) ([]*video_domain.Video, error)
-
-	// StartTranscoding initiates the transcoding process for a video.
-	StartTranscoding(ctx context.Context, videoID uuid.UUID, streamKey string) error
 
 	// GetByID returns a video by its ID.
 	GetByID(ctx context.Context, videoID uuid.UUID) (*video_domain.Video, error)
@@ -51,7 +54,9 @@ type VideoUseCase struct {
 	videoRepo video_domain.Repository
 }
 
-func NewVideoUseCase(videoRepo video_domain.Repository) VideoUseCaseInterface {
+func NewVideoUseCase(
+	videoRepo video_domain.Repository,
+) VideoUseCaseInterface {
 	return &VideoUseCase{
 		videoRepo: videoRepo,
 	}
