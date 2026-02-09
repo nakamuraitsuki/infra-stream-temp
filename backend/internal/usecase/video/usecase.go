@@ -23,7 +23,7 @@ type VideoUseCaseInterface interface {
 	UploadSource(ctx context.Context, videoID uuid.UUID, videoData io.Reader) error
 
 	// StartTranscoding initiates the transcoding process for a video.
-	StartTranscoding(ctx context.Context, videoID uuid.UUID, streamKey string) error
+	StartTranscoding(ctx context.Context, videoID uuid.UUID) error
 
 	// ListMine returns a list of videos owned by the specified user.
 	ListMine(ctx context.Context, ownerID uuid.UUID, query VideoSearchQuery) ([]*video_domain.Video, error)
@@ -49,16 +49,19 @@ type VideoUseCaseInterface interface {
 }
 
 type VideoUseCase struct {
-	videoRepo video_domain.Repository
-	storage   video_domain.Storage
+	videoRepo  video_domain.Repository
+	storage    video_domain.Storage
+	transcoder video_domain.Transcoder
 }
 
 func NewVideoUseCase(
 	videoRepo video_domain.Repository,
 	storage video_domain.Storage,
+	transcoder video_domain.Transcoder,
 ) VideoUseCaseInterface {
 	return &VideoUseCase{
 		videoRepo: videoRepo,
 		storage:   storage,
+		transcoder: transcoder,
 	}
 }
