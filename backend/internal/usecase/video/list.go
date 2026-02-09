@@ -20,16 +20,30 @@ func (uc *VideoUseCase) ListMine(
 	ownerID uuid.UUID,
 	query VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
-	// TODO: 実装
-	return nil, nil
+
+	cond := video_domain.ListCondition{
+		OwnerID: &ownerID,
+		Limit:   query.Limit,
+	}
+
+	return uc.videoRepo.FindByCondition(ctx, cond)
 }
 
 func (uc *VideoUseCase) ListPublic(
 	ctx context.Context,
 	query VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
-	// TODO: 実装
-	return nil, nil
+
+	visibility := video_value.VisibilityPublic
+	status := video_value.StatusReady
+
+	cond := video_domain.ListCondition{
+		Visibility: &visibility,
+		Status:     &status,
+		Limit:      query.Limit,
+	}
+
+	return uc.videoRepo.FindByCondition(ctx, cond)
 }
 
 func (uc *VideoUseCase) SearchByTag(
@@ -37,6 +51,16 @@ func (uc *VideoUseCase) SearchByTag(
 	tag video_value.Tag,
 	query VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
-	// TODO: 実装
-	return nil, nil
+
+	visibility := video_value.VisibilityPublic
+	status := video_value.StatusReady
+
+	cond := video_domain.ListCondition{
+		Tag:        &tag,
+		Visibility: &visibility,
+		Status:     &status,
+		Limit:      query.Limit,
+	}
+
+	return uc.videoRepo.FindByCondition(ctx, cond)
 }

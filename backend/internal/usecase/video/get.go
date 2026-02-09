@@ -11,6 +11,11 @@ func (uc *VideoUseCase) GetByID(
 	ctx context.Context,
 	videoID uuid.UUID,
 ) (*video_domain.Video, error) {
-	// TODO: 実装
-	return nil, nil
+
+	video, err := uc.videoRepo.FindByID(ctx, videoID)
+	if err != nil {
+		return nil, err
+	}
+
+	return video, nil
 }
