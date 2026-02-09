@@ -57,6 +57,14 @@ func (v *Video) SourceKey() string {
 	return v.sourceKey
 }
 
+func (v *Video) StreamKey() string {
+	return v.streamKey
+}
+
+func (v *Video) Visibility() value.Visibility {
+	return v.visibility
+}
+
 func (v *Video) MarkUploaded(sourceKey string) error {
 	if v.status != value.StatusInitial {
 		return errors.New("video is not in initial state")
