@@ -46,6 +46,8 @@ type VideoUseCaseInterface interface {
 	// (e.g. video/mp4, application/x-mpegURL),
 	// not by HTTP-specific concerns.
 	GetVideoStream(ctx context.Context, videoID uuid.UUID) (io.ReadSeeker, string, error)
+
+	GetPlaybackInfo(ctx context.Context, videoID uuid.UUID) (*PlaybackInfo, error)
 }
 
 type VideoUseCase struct {
