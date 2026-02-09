@@ -38,15 +38,9 @@ type VideoUseCaseInterface interface {
 	GetByID(ctx context.Context, videoID uuid.UUID) (*video_domain.Video, error)
 
 	// GetVideoStream returns a readable video stream and its MIME type.
-	//
-	// The returned io.ReadSeeker represents the video content to be streamed.
-	// The caller (e.g. HTTP handler) is responsible for closing it if necessary.
-	//
-	// The MIME type is determined by application-level policy
-	// (e.g. video/mp4, application/x-mpegURL),
-	// not by HTTP-specific concerns.
 	GetVideoStream(ctx context.Context, videoID uuid.UUID) (io.ReadSeeker, string, error)
 
+	// GetPlaybackInfo returns playback information for the specified video.
 	GetPlaybackInfo(ctx context.Context, videoID uuid.UUID) (*PlaybackInfo, error)
 }
 

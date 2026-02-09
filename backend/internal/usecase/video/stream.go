@@ -48,6 +48,10 @@ func (uc *VideoUseCase) GetVideoStream(
 		return nil, "", err
 	}
 
+	if video.Status() != video_value.StatusReady {
+		return nil, "", errors.New("video is not ready for streaming")
+	}
+
 	// Check visibility
 	if video.Visibility() != video_value.VisibilityPublic {
 		return nil, "", errors.New("video is not public")
