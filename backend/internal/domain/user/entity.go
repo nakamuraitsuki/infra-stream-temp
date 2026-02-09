@@ -33,3 +33,18 @@ func NewUser(
 		createdAt: createdAt,
 	}
 }
+
+func (u *User) ID() uuid.UUID {
+	return u.id
+}
+
+// TODO: 名前のバリデーション
+func (u *User) UpdateProfile(name string, bio string) error {
+	u.name = name
+	u.bio = bio
+	return nil
+}
+
+func (u *User) UpdateIcon(iconKey *string) {
+	u.iconKey = iconKey
+}

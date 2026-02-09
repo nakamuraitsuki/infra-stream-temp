@@ -3,6 +3,7 @@ package value
 type Status string
 
 const (
+	StatusInitial    Status = "initial"    // 初期状態
 	StatusUploaded   Status = "uploaded"   // アップロード完了
 	StatusQueued     Status = "queued"     // 非同期処理待ち
 	StatusProcessing Status = "processing" // 非同期処理中
