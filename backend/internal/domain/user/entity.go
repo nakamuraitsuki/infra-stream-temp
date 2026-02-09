@@ -38,7 +38,7 @@ func (u *User) ID() uuid.UUID {
 	return u.id
 }
 
-func (u *User) UpdateProfile(name string, bio string) error{
+func (u *User) UpdateProfile(name string, bio string) error {
 	u.name = name
 	u.bio = bio
 	return nil

@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrVideoNotReady = errors.New("video is not ready for playback")
+	ErrVideoNotReady  = errors.New("video is not ready for playback")
 	ErrVideoForbidden = errors.New("video is not accessible")
 )
 
@@ -23,7 +23,7 @@ func (uc *VideoUseCase) GetPlaybackInfo(
 	ctx context.Context,
 	videoID uuid.UUID,
 ) (*PlaybackInfo, error) {
-	
+
 	video, err := uc.videoRepo.FindByID(ctx, videoID)
 	if err != nil {
 		return nil, err

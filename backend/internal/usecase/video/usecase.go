@@ -56,8 +56,8 @@ func NewVideoUseCase(
 	transcoder video_domain.Transcoder,
 ) VideoUseCaseInterface {
 	return &VideoUseCase{
-		videoRepo: videoRepo,
-		storage:   storage,
+		videoRepo:  videoRepo,
+		storage:    storage,
 		transcoder: transcoder,
 	}
 }
