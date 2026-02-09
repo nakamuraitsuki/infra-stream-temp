@@ -2,6 +2,7 @@ package video
 
 import (
 	"context"
+	"time"
 
 	video_domain "example.com/m/internal/domain/video"
 	"example.com/m/internal/domain/video/value"
@@ -11,12 +12,37 @@ import (
 func (uc *VideoUseCase) Create(
 	ctx context.Context,
 	ownerID uuid.UUID,
-	sourceKey string,
 	title string,
 	description string,
 	tags []value.Tag,
-	visibility value.Visibility,
 ) (*video_domain.Video, error) {
-	// TODO: 実装
-	return nil, nil
+
+	videoID := uuid.New()
+
+	status := value.StatusInitial
+
+	// NOTE: sourceKey and streamKey will be set after the video data is uploaded.
+	sourceKey := ""
+	streamKey := ""
+
+	visibility := value.VisibilityPrivate
+
+	video := video_domain.NewVideo(
+		videoID,
+		ownerID,
+		sourceKey,
+		streamKey,
+		status,
+		title,
+		description,
+		tags,
+		visibility,
+		time.Now(),
+	)
+
+	if err := uc.videoRepo.Save(ctx, video); err != nil {
+		return nil, err
+	}
+
+	return video, nil
 }

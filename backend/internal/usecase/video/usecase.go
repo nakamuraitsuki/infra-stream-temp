@@ -14,11 +14,9 @@ type VideoUseCaseInterface interface {
 	Create(
 		ctx context.Context,
 		ownerID uuid.UUID,
-		sourceKey string,
 		title string,
 		description string,
 		tags []video_value.Tag,
-		visibility video_value.Visibility,
 	) (*video_domain.Video, error)
 
 	// UploadSource uploads the raw video data for the specified video.
