@@ -49,6 +49,19 @@ func NewVideo(
 	}
 }
 
+func (v *Video) Status() value.Status {
+	return v.status
+}
+
+func (v *Video) MarkUploaded(sourceKey string) error {
+	if v.status != value.StatusInitial {
+		return errors.New("video is not in initial state")
+	}
+	v.sourceKey = sourceKey
+	v.status = value.StatusUploaded
+	return nil
+}
+
 func (v *Video) StartTranscoding() error {
 	if v.status != value.StatusUploaded {
 		return errors.New("video is not transcodable")

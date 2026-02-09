@@ -50,12 +50,15 @@ type VideoUseCaseInterface interface {
 
 type VideoUseCase struct {
 	videoRepo video_domain.Repository
+	storage   video_domain.Storage
 }
 
 func NewVideoUseCase(
 	videoRepo video_domain.Repository,
+	storage video_domain.Storage,
 ) VideoUseCaseInterface {
 	return &VideoUseCase{
 		videoRepo: videoRepo,
+		storage:   storage,
 	}
 }
