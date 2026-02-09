@@ -25,5 +25,10 @@ func (uc *UserUseCase) UpdateIcon(
 
 	user.UpdateIcon(&key)
 
-	return uc.repo.Save(ctx, user)
+	if err := uc.repo.Save(ctx, user); err != nil {
+		_ = uc.iconStorage.Delete(ctx, key)
+		return err
+	}
+
+	return nil
 }
