@@ -9,6 +9,11 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrVideoNotReady = errors.New("video is not ready for playback")
+	ErrVideoForbidden = errors.New("video is not accessible")
+)
+
 type PlaybackInfo struct {
 	StreamKey string // URL 組み立てはHandler側で行う（リダイレクト）
 	MIMEType  string
@@ -25,11 +30,11 @@ func (uc *VideoUseCase) GetPlaybackInfo(
 	}
 
 	if video.Status() != video_value.StatusReady {
-		return nil, errors.New("not ready")
+		return nil, ErrVideoNotReady
 	}
 
 	if video.Visibility() != video_value.VisibilityPublic {
-		return nil, errors.New("forbidden")
+		return nil, ErrVideoForbidden
 	}
 
 	return &PlaybackInfo{
@@ -49,12 +54,12 @@ func (uc *VideoUseCase) GetVideoStream(
 	}
 
 	if video.Status() != video_value.StatusReady {
-		return nil, "", errors.New("video is not ready for streaming")
+		return nil, "", ErrVideoNotReady
 	}
 
 	// Check visibility
 	if video.Visibility() != video_value.VisibilityPublic {
-		return nil, "", errors.New("video is not public")
+		return nil, "", ErrVideoForbidden
 	}
 
 	// MIME type defined by application-level policy
