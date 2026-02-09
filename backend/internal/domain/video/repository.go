@@ -7,6 +7,18 @@ import (
 	"github.com/google/uuid"
 )
 
+// ListCondition defines the conditions for listing videos.
+type ListCondition struct {
+	OwnerID    *uuid.UUID
+	Tag        *value.Tag
+	Visibility *value.Visibility
+	Status     *value.Status
+
+	Limit  int
+	Offset int
+	// add more fields as needed
+}
+
 type Repository interface {
 	FindByID(ctx context.Context, id uuid.UUID) (*Video, error)
 	Save(ctx context.Context, v *Video) error
@@ -20,20 +32,8 @@ type Repository interface {
 		failureReason *value.FailureReason,
 	) error
 
-	ListByOwner(
+	FindByCondition(
 		ctx context.Context,
-		ownerID uuid.UUID,
-		limit int,
-	) ([]*Video, error)
-
-	ListPublic(
-		ctx context.Context,
-		limit int,
-	) ([]*Video, error)
-
-	SearchByTag(
-		ctx context.Context,
-		tag value.Tag,
-		limit int,
+		cond ListCondition,
 	) ([]*Video, error)
 }
