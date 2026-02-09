@@ -22,13 +22,13 @@ type VideoUseCaseInterface interface {
 	) (*video_domain.Video, error)
 
 	// ListMine returns a list of videos owned by the specified user.
-	ListMine(ctx context.Context, ownerID uuid.UUID, limit int) ([]*video_domain.Video, error)
+	ListMine(ctx context.Context, ownerID uuid.UUID, query VideoSearchQuery) ([]*video_domain.Video, error)
 
 	// ListPublic returns a list of publicly available videos for viewing.
-	ListPublic(ctx context.Context, limit int) ([]*video_domain.Video, error)
+	ListPublic(ctx context.Context, query VideoSearchQuery) ([]*video_domain.Video, error)
 
 	// SearchByTag returns a list of videos matching the specified tag.
-	SearchByTag(ctx context.Context, tag video_value.Tag, limit int) ([]*video_domain.Video, error)
+	SearchByTag(ctx context.Context, tag video_value.Tag, query VideoSearchQuery) ([]*video_domain.Video, error)
 
 	// StartTranscoding initiates the transcoding process for a video.
 	StartTranscoding(ctx context.Context, videoID uuid.UUID, streamKey string) error

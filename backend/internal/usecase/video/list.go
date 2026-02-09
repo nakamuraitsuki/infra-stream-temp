@@ -8,10 +8,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// VideoSearchQuery defines the parameters for searching videos.
+// example: limit, offset, sort order, etc.
+type VideoSearchQuery struct {
+	Limit int
+	// add more fields as needed
+}
+
 func (uc *VideoUseCase) ListMine(
 	ctx context.Context,
 	ownerID uuid.UUID,
-	limit int,
+	query VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
 	// TODO: 実装
 	return nil, nil
@@ -19,7 +26,7 @@ func (uc *VideoUseCase) ListMine(
 
 func (uc *VideoUseCase) ListPublic(
 	ctx context.Context,
-	limit int,
+	query VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
 	// TODO: 実装
 	return nil, nil
@@ -28,7 +35,7 @@ func (uc *VideoUseCase) ListPublic(
 func (uc *VideoUseCase) SearchByTag(
 	ctx context.Context,
 	tag video_value.Tag,
-	limit int,
+	query VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
 	// TODO: 実装
 	return nil, nil
