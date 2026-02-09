@@ -28,17 +28,18 @@ func (uc *VideoUseCase) StartTranscoding(
 		videoID.String(),
 	)
 
+	// 先にトランスコードを実行し、成功した場合のみ状態を遷移させて永続化する
+	if err := uc.transcoder.Transcode(
+		ctx,
+		video.SourceKey(),
+		streamKey,
+	); err != nil {
+		return err
+	}
+
 	if err := video.StartTranscoding(streamKey); err != nil {
 		return err
 	}
 
-	if err := uc.videoRepo.Save(ctx, video); err != nil {
-		return err
-	}
-
-	return uc.transcoder.Transcode(
-		ctx,
-		video.SourceKey(),
-		streamKey,
-	)
+	return uc.videoRepo.Save(ctx, video)
 }
