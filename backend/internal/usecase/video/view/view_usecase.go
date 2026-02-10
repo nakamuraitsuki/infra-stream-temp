@@ -18,13 +18,13 @@ var (
 
 type VideoViewingUseCaseInterface interface {
 	// GetByID returns a video by its ID.
-	GetByID(ctx context.Context, videoID uuid.UUID) (*video_domain.Video, error)
+	GetByID(ctx context.Context, videoID uuid.UUID) (*GetByIDResult, error)
 
 	// ListPublic returns a list of publicly available videos for viewing.
-	ListPublic(ctx context.Context, query query.VideoSearchQuery) ([]*video_domain.Video, error)
+	ListPublic(ctx context.Context, query query.VideoSearchQuery) (*ListPublicResult, error)
 
 	// SearchByTag returns a list of videos matching the specified tag.
-	SearchByTag(ctx context.Context, tag video_value.Tag, query query.VideoSearchQuery) ([]*video_domain.Video, error)
+	SearchByTag(ctx context.Context, tag video_value.Tag, query query.VideoSearchQuery) (*GetByTagsResults, error)
 
 	// GetPlaybackInfo returns playback information for the specified video.
 	GetPlaybackInfo(ctx context.Context, videoID uuid.UUID) (*PlaybackInfo, error)

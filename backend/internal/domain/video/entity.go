@@ -49,6 +49,30 @@ func NewVideo(
 	}
 }
 
+func (v *Video) ID() uuid.UUID {
+	return v.id
+}
+
+func (v *Video) OwnerID() uuid.UUID {
+	return v.ownerID
+}
+
+func (v *Video) Title() string {
+	return v.title
+}
+
+func (v *Video) Description() string {
+	return v.description
+}
+
+func (v *Video) Tags() []value.Tag {
+	return v.tags
+}
+
+func (v *Video) CreatedAt() time.Time {
+	return v.createdAt
+}
+
 func (v *Video) Status() value.Status {
 	return v.status
 }
