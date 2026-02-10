@@ -11,6 +11,8 @@ func RegisterRoutes(e *echo.Echo, mh *manager.VideoManagementHandler, vh *viewer
 	e.GET("/videos/:id", vh.GetByID)
 	e.GET("/videos", vh.ListPublic)
 	e.GET("/videos/search", vh.SearchByTag)
+	e.GET("/api/videos/:id/playback-info", vh.GetPlaybackInfo)
+	e.GET("/api/videos/:id/stream", vh.GetVideoStream) // 比較用
 
 	videos := e.Group("/videos")
 	videos.Use(middleware.DummyAuthMiddleware) // Dummyの認証ミドルウェアを使用
