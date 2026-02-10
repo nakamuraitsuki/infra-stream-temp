@@ -18,18 +18,24 @@ type GetByTagsResult struct {
 	ID          uuid.UUID
 	Title       string
 	Description string
+	Tags        []string
 	OwnerID     uuid.UUID
 	CreatedAt   time.Time
 }
 
 func (uc *VideoViewingUseCase) SearchByTag(
 	ctx context.Context,
-	tag video_value.Tag,
+	tagStr string,
 	query query.VideoSearchQuery,
 ) (*GetByTagsResults, error) {
 
 	visibility := video_value.VisibilityPublic
 	status := video_value.StatusReady
+
+	tag, err := video_value.NewTag(tagStr)
+	if err != nil {
+		return nil, err
+	}
 
 	cond := video_domain.ListCondition{
 		Tag:        &tag,
@@ -53,7 +59,7 @@ func (uc *VideoViewingUseCase) SearchByTag(
 			CreatedAt:   video.CreatedAt(),
 		}
 	}
-	
+
 	return &GetByTagsResults{
 		Results: results,
 	}, nil

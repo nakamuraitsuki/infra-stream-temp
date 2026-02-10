@@ -34,3 +34,15 @@ type VideoManagementUseCase struct {
 	Storage    video_domain.Storage
 	Transcoder video_domain.Transcoder
 }
+
+func NewVideoManagementUseCase(
+	videoRepo video_domain.Repository,
+	storage video_domain.Storage,
+	transcoder video_domain.Transcoder,
+) VideoManagementUseCaseInterface {
+	return &VideoManagementUseCase{
+		VideoRepo:  videoRepo,
+		Storage:    storage,
+		Transcoder: transcoder,
+	}
+}

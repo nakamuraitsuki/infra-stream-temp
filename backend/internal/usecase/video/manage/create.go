@@ -13,6 +13,7 @@ type CreateResponse struct {
 	ID          uuid.UUID
 	Title       string
 	Description string
+	Status      string
 	Tags        []string
 	Visibility  string
 	CreatedAt   time.Time
@@ -62,11 +63,11 @@ func (uc *VideoManagementUseCase) Create(
 		return nil, err
 	}
 
-	
 	return &CreateResponse{
 		ID:          video.ID(),
 		Title:       video.Title(),
 		Description: video.Description(),
+		Status:      string(video.Status()),
 		Tags:        tagsStr,
 		Visibility:  string(video.Visibility()),
 		CreatedAt:   video.CreatedAt(),

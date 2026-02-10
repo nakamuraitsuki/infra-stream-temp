@@ -1,0 +1,45 @@
+package viewer
+
+import (
+	"net/http"
+
+	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
+)
+
+type GetByIDResponse struct {
+	ID          string   `json:"id"`
+	OwnerID     string   `json:"owner_id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Tags        []string `json:"tags"`
+	Visibility  string   `json:"visibility"`
+	CreatedAt   string   `json:"created_at"`
+}
+
+func (h *VideoViewingHandler) GetByID(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	videoIDStr := c.Param("id")
+	videoID, err := uuid.Parse(videoIDStr)
+	if err != nil {
+		return echo.ErrBadRequest
+	}
+
+	result, err := h.usecase.GetByID(ctx, videoID)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	resp := GetByIDResponse{
+		ID:          result.ID.String(),
+		OwnerID:     result.OwnerID.String(),
+		Title:       result.Title,
+		Description: result.Description,
+		Tags:        result.Tags,
+		Visibility:  result.Visibility,
+		CreatedAt:   result.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}

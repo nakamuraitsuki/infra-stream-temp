@@ -6,7 +6,6 @@ import (
 	"io"
 
 	video_domain "example.com/m/internal/domain/video"
-	video_value "example.com/m/internal/domain/video/value"
 	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
 )
@@ -24,7 +23,7 @@ type VideoViewingUseCaseInterface interface {
 	ListPublic(ctx context.Context, query query.VideoSearchQuery) (*ListPublicResult, error)
 
 	// SearchByTag returns a list of videos matching the specified tag.
-	SearchByTag(ctx context.Context, tag video_value.Tag, query query.VideoSearchQuery) (*GetByTagsResults, error)
+	SearchByTag(ctx context.Context, tagStr string, query query.VideoSearchQuery) (*GetByTagsResults, error)
 
 	// GetPlaybackInfo returns playback information for the specified video.
 	GetPlaybackInfo(ctx context.Context, videoID uuid.UUID) (*PlaybackInfo, error)
@@ -36,4 +35,14 @@ type VideoViewingUseCaseInterface interface {
 type VideoViewingUseCase struct {
 	VideoRepo video_domain.Repository
 	Storage   video_domain.Storage
+}
+
+func NewVideoViewingUseCase(
+	videoRepo video_domain.Repository,
+	storage video_domain.Storage,
+) VideoViewingUseCaseInterface {
+	return &VideoViewingUseCase{
+		VideoRepo: videoRepo,
+		Storage:   storage,
+	}
 }
