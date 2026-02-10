@@ -1,4 +1,4 @@
-package video
+package manage
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 
 	video_domain "example.com/m/internal/domain/video"
 	video_value "example.com/m/internal/domain/video/value"
+	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
 )
 
@@ -26,11 +27,11 @@ type VideoManagementUseCaseInterface interface {
 	StartTranscoding(ctx context.Context, videoID uuid.UUID) error
 
 	// ListMine returns a list of videos owned by the specified user.
-	ListMine(ctx context.Context, ownerID uuid.UUID, query VideoSearchQuery) ([]*video_domain.Video, error)
+	ListMine(ctx context.Context, ownerID uuid.UUID, query query.VideoSearchQuery) ([]*video_domain.Video, error)
 }
 
-type videoManagementUseCase struct {
-	videoRepo  video_domain.Repository
-	storage    video_domain.Storage
-	transcoder video_domain.Transcoder
+type VideoManagementUseCase struct {
+	VideoRepo  video_domain.Repository
+	Storage    video_domain.Storage
+	Transcoder video_domain.Transcoder
 }

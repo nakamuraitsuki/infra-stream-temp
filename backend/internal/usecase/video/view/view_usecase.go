@@ -1,12 +1,19 @@
-package video
+package view
 
 import (
 	"context"
+	"errors"
 	"io"
 
 	video_domain "example.com/m/internal/domain/video"
 	video_value "example.com/m/internal/domain/video/value"
+	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
+)
+
+var (
+	ErrVideoNotReady  = errors.New("video is not ready for playback")
+	ErrVideoForbidden = errors.New("video is not accessible")
 )
 
 type VideoViewingUseCaseInterface interface {
@@ -14,10 +21,10 @@ type VideoViewingUseCaseInterface interface {
 	GetByID(ctx context.Context, videoID uuid.UUID) (*video_domain.Video, error)
 
 	// ListPublic returns a list of publicly available videos for viewing.
-	ListPublic(ctx context.Context, query VideoSearchQuery) ([]*video_domain.Video, error)
+	ListPublic(ctx context.Context, query query.VideoSearchQuery) ([]*video_domain.Video, error)
 
 	// SearchByTag returns a list of videos matching the specified tag.
-	SearchByTag(ctx context.Context, tag video_value.Tag, query VideoSearchQuery) ([]*video_domain.Video, error)
+	SearchByTag(ctx context.Context, tag video_value.Tag, query query.VideoSearchQuery) ([]*video_domain.Video, error)
 
 	// GetPlaybackInfo returns playback information for the specified video.
 	GetPlaybackInfo(ctx context.Context, videoID uuid.UUID) (*PlaybackInfo, error)
@@ -26,7 +33,7 @@ type VideoViewingUseCaseInterface interface {
 	GetVideoStream(ctx context.Context, videoID uuid.UUID) (io.ReadSeeker, string, error)
 }
 
-type videoViewingUseCase struct {
-	videoRepo video_domain.Repository
-	storage   video_domain.Storage
+type VideoViewingUseCase struct {
+	VideoRepo video_domain.Repository
+	Storage   video_domain.Storage
 }

@@ -1,13 +1,11 @@
 package video
 
-import "errors"
+import (
+	"example.com/m/internal/usecase/video/manage"
+	"example.com/m/internal/usecase/video/view"
+)
 
 type VideoUseCaseInterface interface {
-	VideoManagementUseCaseInterface
-	VideoViewingUseCaseInterface
+	manage.VideoManagementUseCaseInterface
+	view.VideoViewingUseCaseInterface
 }
-
-var (
-	ErrVideoNotReady  = errors.New("video is not ready for playback")
-	ErrVideoForbidden = errors.New("video is not accessible")
-)

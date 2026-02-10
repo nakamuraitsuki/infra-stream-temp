@@ -1,4 +1,4 @@
-package video
+package manage
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 
 	video_domain "example.com/m/internal/domain/video"
 	video_value "example.com/m/internal/domain/video/value"
+	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
 )
 
-func (uc *videoManagementUseCase) Create(
+func (uc *VideoManagementUseCase) Create(
 	ctx context.Context,
 	ownerID uuid.UUID,
 	title string,
@@ -42,20 +43,20 @@ func (uc *videoManagementUseCase) Create(
 		time.Now(),
 	)
 
-	if err := uc.videoRepo.Save(ctx, video); err != nil {
+	if err := uc.VideoRepo.Save(ctx, video); err != nil {
 		return nil, err
 	}
 
 	return video, nil
 }
 
-func (uc *videoManagementUseCase) UploadSource(
+func (uc *VideoManagementUseCase) UploadSource(
 	ctx context.Context,
 	videoID uuid.UUID,
 	videoData io.Reader,
 ) error {
 
-	video, err := uc.videoRepo.FindByID(ctx, videoID)
+	video, err := uc.VideoRepo.FindByID(ctx, videoID)
 	if err != nil {
 		return err
 	}
@@ -70,31 +71,31 @@ func (uc *videoManagementUseCase) UploadSource(
 		videoID.String(),
 	)
 
-	if err := uc.storage.SaveSource(ctx, sourceKey, videoData); err != nil {
+	if err := uc.Storage.SaveSource(ctx, sourceKey, videoData); err != nil {
 		return err
 	}
 
 	if err := video.MarkUploaded(sourceKey); err != nil {
 		// NOTE: best-effort cleanup. orphaned data may remain.
-		_ = uc.storage.Delete(ctx, sourceKey)
+		_ = uc.Storage.Delete(ctx, sourceKey)
 		return err
 	}
 
-	if err := uc.videoRepo.Save(ctx, video); err != nil {
+	if err := uc.VideoRepo.Save(ctx, video); err != nil {
 		// NOTE: best-effort cleanup. orphaned data may remain.
-		_ = uc.storage.Delete(ctx, sourceKey)
+		_ = uc.Storage.Delete(ctx, sourceKey)
 		return err
 	}
 
 	return nil
 }
 
-func (uc *videoManagementUseCase) StartTranscoding(
+func (uc *VideoManagementUseCase) StartTranscoding(
 	ctx context.Context,
 	videoID uuid.UUID,
 ) error {
 
-	video, err := uc.videoRepo.FindByID(ctx, videoID)
+	video, err := uc.VideoRepo.FindByID(ctx, videoID)
 	if err != nil {
 		return err
 	}
@@ -110,7 +111,7 @@ func (uc *videoManagementUseCase) StartTranscoding(
 	)
 
 	// 先にトランスコードを実行し、成功した場合のみ状態を遷移させて永続化する
-	if err := uc.transcoder.Transcode(
+	if err := uc.Transcoder.Transcode(
 		ctx,
 		video.SourceKey(),
 		streamKey,
@@ -122,13 +123,13 @@ func (uc *videoManagementUseCase) StartTranscoding(
 		return err
 	}
 
-	return uc.videoRepo.Save(ctx, video)
+	return uc.VideoRepo.Save(ctx, video)
 }
 
-func (uc *videoManagementUseCase) ListMine(
+func (uc *VideoManagementUseCase) ListMine(
 	ctx context.Context,
 	ownerID uuid.UUID,
-	query VideoSearchQuery,
+	query query.VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
 
 	cond := video_domain.ListCondition{
@@ -136,5 +137,5 @@ func (uc *videoManagementUseCase) ListMine(
 		Limit:   query.Limit,
 	}
 
-	return uc.videoRepo.FindByCondition(ctx, cond)
+	return uc.VideoRepo.FindByCondition(ctx, cond)
 }

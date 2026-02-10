@@ -1,6 +1,10 @@
 package video
 
-import video_domain "example.com/m/internal/domain/video"
+import (
+	video_domain "example.com/m/internal/domain/video"
+	"example.com/m/internal/usecase/video/manage"
+	"example.com/m/internal/usecase/video/view"
+)
 
 func NewVideoUseCase(
 	videoRepo video_domain.Repository,
@@ -8,17 +12,17 @@ func NewVideoUseCase(
 	transcoder video_domain.Transcoder,
 ) VideoUseCaseInterface {
 	return &struct {
-		VideoManagementUseCaseInterface
-		VideoViewingUseCaseInterface
-	} {
-		VideoManagementUseCaseInterface: &videoManagementUseCase{
-			videoRepo:  videoRepo,
-			storage:    storage,
-			transcoder: transcoder,
+		manage.VideoManagementUseCaseInterface
+		view.VideoViewingUseCaseInterface
+	}{
+		VideoManagementUseCaseInterface: &manage.VideoManagementUseCase{
+			VideoRepo:  videoRepo,
+			Storage:    storage,
+			Transcoder: transcoder,
 		},
-		VideoViewingUseCaseInterface: &videoViewingUseCase{
-			videoRepo: videoRepo,
-			storage:   storage,
+		VideoViewingUseCaseInterface: &view.VideoViewingUseCase{
+			VideoRepo: videoRepo,
+			Storage:   storage,
 		},
 	}
 }

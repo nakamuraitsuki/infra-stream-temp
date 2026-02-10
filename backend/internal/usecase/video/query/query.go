@@ -1,4 +1,4 @@
-package video
+package query
 
 // VideoSearchQuery defines the parameters for searching videos.
 // example: limit, offset, sort order, etc.

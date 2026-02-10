@@ -1,4 +1,4 @@
-package video
+package view
 
 import (
 	"context"
@@ -6,15 +6,21 @@ import (
 
 	video_domain "example.com/m/internal/domain/video"
 	video_value "example.com/m/internal/domain/video/value"
+	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
 )
 
-func (uc *videoViewingUseCase) GetByID(
+type PlaybackInfo struct {
+	StreamKey string // URL 組み立てはHandler側で行う（リダイレクト）
+	MIMEType  string
+}
+
+func (uc *VideoViewingUseCase) GetByID(
 	ctx context.Context,
 	videoID uuid.UUID,
 ) (*video_domain.Video, error) {
 
-	video, err := uc.videoRepo.FindByID(ctx, videoID)
+	video, err := uc.VideoRepo.FindByID(ctx, videoID)
 	if err != nil {
 		return nil, err
 	}
@@ -22,9 +28,9 @@ func (uc *videoViewingUseCase) GetByID(
 	return video, nil
 }
 
-func (uc *videoViewingUseCase) ListPublic(
+func (uc *VideoViewingUseCase) ListPublic(
 	ctx context.Context,
-	query VideoSearchQuery,
+	query query.VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
 
 	visibility := video_value.VisibilityPublic
@@ -36,13 +42,13 @@ func (uc *videoViewingUseCase) ListPublic(
 		Limit:      query.Limit,
 	}
 
-	return uc.videoRepo.FindByCondition(ctx, cond)
+	return uc.VideoRepo.FindByCondition(ctx, cond)
 }
 
-func (uc *videoViewingUseCase) SearchByTag(
+func (uc *VideoViewingUseCase) SearchByTag(
 	ctx context.Context,
 	tag video_value.Tag,
-	query VideoSearchQuery,
+	query query.VideoSearchQuery,
 ) ([]*video_domain.Video, error) {
 
 	visibility := video_value.VisibilityPublic
@@ -55,15 +61,15 @@ func (uc *videoViewingUseCase) SearchByTag(
 		Limit:      query.Limit,
 	}
 
-	return uc.videoRepo.FindByCondition(ctx, cond)
+	return uc.VideoRepo.FindByCondition(ctx, cond)
 }
 
-func (uc *videoViewingUseCase) GetPlaybackInfo(
+func (uc *VideoViewingUseCase) GetPlaybackInfo(
 	ctx context.Context,
 	videoID uuid.UUID,
 ) (*PlaybackInfo, error) {
 
-	video, err := uc.videoRepo.FindByID(ctx, videoID)
+	video, err := uc.VideoRepo.FindByID(ctx, videoID)
 	if err != nil {
 		return nil, err
 	}
@@ -82,12 +88,12 @@ func (uc *videoViewingUseCase) GetPlaybackInfo(
 	}, nil
 }
 
-func (uc *videoViewingUseCase) GetVideoStream(
+func (uc *VideoViewingUseCase) GetVideoStream(
 	ctx context.Context,
 	videoID uuid.UUID,
 ) (io.ReadSeeker, string, error) {
 
-	video, err := uc.videoRepo.FindByID(ctx, videoID)
+	video, err := uc.VideoRepo.FindByID(ctx, videoID)
 	if err != nil {
 		return nil, "", err
 	}
@@ -105,7 +111,7 @@ func (uc *videoViewingUseCase) GetVideoStream(
 	mimeType := "application/x-mpegURL" // HLS
 	// if needed, determine MIME type based on video properties
 
-	stream, err := uc.storage.GetStream(ctx, video.StreamKey())
+	stream, err := uc.Storage.GetStream(ctx, video.StreamKey())
 	if err != nil {
 		return nil, "", err
 	}
