@@ -9,16 +9,23 @@ import (
 	"github.com/google/uuid"
 )
 
+type RegisterResult struct {
+	ID      uuid.UUID
+	Name    string
+	Bio     string
+	IconKey *string
+	Role    string
+}
+
 func (uc *UserUseCase) Register(
 	ctx context.Context,
 	name string,
-	bio string,
-) (*user.User, error) {
+) (*RegisterResult, error) {
 
 	user := user.NewUser(
 		uuid.New(),
 		name,
-		bio,
+		"",
 		nil,
 		value.RoleUser,
 		time.Now(),
@@ -28,5 +35,11 @@ func (uc *UserUseCase) Register(
 		return nil, err
 	}
 
-	return user, nil
+	return &RegisterResult{
+		ID:      user.ID(),
+		Name:    user.Name(),
+		Bio:     user.Bio(),
+		IconKey: user.IconKey(),
+		Role:    string(user.Role()),
+	}, nil
 }

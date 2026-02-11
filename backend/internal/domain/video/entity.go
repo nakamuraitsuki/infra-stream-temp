@@ -49,6 +49,30 @@ func NewVideo(
 	}
 }
 
+func (v *Video) ID() uuid.UUID {
+	return v.id
+}
+
+func (v *Video) OwnerID() uuid.UUID {
+	return v.ownerID
+}
+
+func (v *Video) Title() string {
+	return v.title
+}
+
+func (v *Video) Description() string {
+	return v.description
+}
+
+func (v *Video) Tags() []value.Tag {
+	return v.tags
+}
+
+func (v *Video) CreatedAt() time.Time {
+	return v.createdAt
+}
+
 func (v *Video) Status() value.Status {
 	return v.status
 }
@@ -80,6 +104,14 @@ func (v *Video) StartTranscoding(streamKey string) error {
 	}
 	v.streamKey = streamKey
 	v.status = value.StatusProcessing
+	return nil
+}
+
+func (v *Video) RollbackToUploaded() error {
+	if v.status != value.StatusProcessing {
+		return errors.New("video is not in processing state")
+	}
+	v.status = value.StatusUploaded
 	return nil
 }
 

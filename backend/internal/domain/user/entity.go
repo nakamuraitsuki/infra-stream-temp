@@ -37,6 +37,21 @@ func NewUser(
 func (u *User) ID() uuid.UUID {
 	return u.id
 }
+func (u *User) Name() string {
+	return u.name
+}
+func (u *User) Bio() string {
+	return u.bio
+}
+func (u *User) IconKey() *string {
+	return u.iconKey
+}
+func (u *User) Role() value.Role {
+	return u.role
+}
+func (u *User) CreatedAt() time.Time {
+	return u.createdAt
+}
 
 // TODO: 名前のバリデーション
 func (u *User) UpdateProfile(name string, bio string) error {
