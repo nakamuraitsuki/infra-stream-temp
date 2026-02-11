@@ -2,9 +2,13 @@ package manage
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	video_value "example.com/m/internal/domain/video/value"
+	"example.com/m/internal/usecase/job"
+	"example.com/m/internal/usecase/video/process"
 	"github.com/google/uuid"
 )
 
@@ -28,18 +32,28 @@ func (uc *VideoManagementUseCase) StartTranscoding(
 		videoID.String(),
 	)
 
-	// 先にトランスコードを実行し、成功した場合のみ状態を遷移させて永続化する
-	if err := uc.Transcoder.Transcode(
-		ctx,
-		video.SourceKey(),
-		streamKey,
-	); err != nil {
-		return err
-	}
-
 	if err := video.StartTranscoding(streamKey); err != nil {
 		return err
 	}
 
-	return uc.VideoRepo.Save(ctx, video)
+	err = uc.VideoRepo.Save(ctx, video)
+	if err != nil {
+		return err
+	}
+
+	payload := process.TranscodePayload{
+		VideoID: videoID,
+	}
+
+	data, _ := json.Marshal(payload)
+
+	meta := job.Metadata{
+		ID:        uuid.New(),
+		Type:      "video_transcode",
+		Attempt:   0,
+		MaxRetry:  3,
+		CreatedAt: time.Now(),
+	}
+
+	return uc.JobQueue.Enqueue(ctx, meta, data)
 }

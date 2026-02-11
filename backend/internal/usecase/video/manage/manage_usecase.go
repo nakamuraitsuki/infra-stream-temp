@@ -5,6 +5,7 @@ import (
 	"io"
 
 	video_domain "example.com/m/internal/domain/video"
+	"example.com/m/internal/usecase/job"
 	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
 )
@@ -33,16 +34,19 @@ type VideoManagementUseCase struct {
 	VideoRepo  video_domain.Repository
 	Storage    video_domain.Storage
 	Transcoder video_domain.Transcoder
+	JobQueue	 job.Queue
 }
 
 func NewVideoManagementUseCase(
 	videoRepo video_domain.Repository,
 	storage video_domain.Storage,
 	transcoder video_domain.Transcoder,
+	jobQueue job.Queue,
 ) VideoManagementUseCaseInterface {
 	return &VideoManagementUseCase{
 		VideoRepo:  videoRepo,
 		Storage:    storage,
 		Transcoder: transcoder,
+		JobQueue:   jobQueue,
 	}
 }
