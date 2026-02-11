@@ -45,7 +45,16 @@ func (uc *VideoManagementUseCase) StartTranscoding(
 		VideoID: videoID,
 	}
 
-	data, _ := json.Marshal(payload)
+	data, err := json.Marshal(payload)
+	if err != nil {
+		if rollbackErr := video.RollbackToUploaded(); rollbackErr != nil {
+			return fmt.Errorf("failed to marshal payload: %v; also failed to rollback video status: %v", err, rollbackErr)
+		}
+		if saveErr := uc.VideoRepo.Save(ctx, video); saveErr != nil {
+			return fmt.Errorf("failed to marshal payload: %v; also failed to save rolled back video status: %v", err, saveErr)
+		}
+		return err
+	}
 
 	meta := job.Metadata{
 		ID:        uuid.New(),
