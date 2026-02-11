@@ -39,7 +39,10 @@ func (h *Handler) UpdateIcon(c echo.Context) error {
 	}
 
 	if err := h.usecase.UpdateIcon(ctx, userID, data); err != nil {
-		return echo.ErrBadRequest
+		if httpErr, ok := err.(*echo.HTTPError); ok {
+			return httpErr
+		}
+		return echo.ErrInternalServerError
 	}
 
 	return c.NoContent(204)
