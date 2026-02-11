@@ -14,34 +14,30 @@ func (uc *VideoManagementUseCase) UploadSource(
 	videoID uuid.UUID,
 	videoData io.Reader,
 ) error {
-
-	video, err := uc.VideoRepo.FindByID(ctx, videoID)
-	if err != nil {
-		return err
-	}
-
-	// 冪等性確保
-	if video.Status() != video_value.StatusInitial {
-		return nil
-	}
-
 	sourceKey := fmt.Sprintf(
 		"videos/%s/source",
 		videoID.String(),
 	)
+	
+	err := uc.UoW.Do(ctx, func(ctx context.Context) error {
+		video, err := uc.VideoRepo.FindByID(ctx, videoID)
+		if err != nil {
+			return err
+		}
 
-	if err := uc.Storage.SaveSource(ctx, sourceKey, videoData); err != nil {
-		return err
-	}
+		if video.Status() != video_value.StatusInitial {
+			return nil
+		}
 
-	if err := video.MarkUploaded(sourceKey); err != nil {
-		// NOTE: best-effort cleanup. orphaned data may remain.
-		_ = uc.Storage.Delete(ctx, sourceKey)
-		return err
-	}
+		if err := video.MarkUploaded(sourceKey); err != nil {
+			return err
+		}
 
-	if err := uc.VideoRepo.Save(ctx, video); err != nil {
-		// NOTE: best-effort cleanup. orphaned data may remain.
+		return uc.VideoRepo.Save(ctx, video)
+	})
+
+	if err != nil {
+		// DBが失敗した時だけ、保存してしまったファイルを消す
 		_ = uc.Storage.Delete(ctx, sourceKey)
 		return err
 	}
