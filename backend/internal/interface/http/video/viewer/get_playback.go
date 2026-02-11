@@ -16,8 +16,8 @@ type GetPlaybackInfoResponse struct {
 func (h *VideoViewingHandler) GetPlaybackInfo(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	pvideoIDStr := c.Param("video_id")
-	videoID, err := uuid.Parse(pvideoIDStr)
+	videoIDStr := c.Param("id")
+	videoID, err := uuid.Parse(videoIDStr)
 	if err != nil {
 		return echo.ErrBadRequest
 	}
