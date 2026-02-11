@@ -6,7 +6,7 @@ type VideoViewingHandler struct {
 	usecase view.VideoViewingUseCaseInterface
 }
 
-func NewVideoViewingHandler(usecase *view.VideoViewingUseCase) *VideoViewingHandler {
+func NewVideoViewingHandler(usecase view.VideoViewingUseCaseInterface) *VideoViewingHandler {
 	return &VideoViewingHandler{
 		usecase: usecase,
 	}
