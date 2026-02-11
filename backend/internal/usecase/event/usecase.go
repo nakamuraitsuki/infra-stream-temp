@@ -8,9 +8,23 @@ import (
 	"example.com/m/internal/usecase/job"
 )
 
+type EventRelayUseCaseInterface interface {
+	ProcessOutbox(ctx context.Context) error
+}
+
 type EventRelayUseCase struct {
 	OutboxRepo shared.OutboxRepository
 	JobQueue   job.Queue
+}
+
+func NewEventRelayUseCase(
+	outboxRepo shared.OutboxRepository,
+	jobQueue job.Queue,
+) EventRelayUseCaseInterface {
+	return &EventRelayUseCase{
+		OutboxRepo: outboxRepo,
+		JobQueue:   jobQueue,
+	}
 }
 
 func (uc *EventRelayUseCase) ProcessOutbox(ctx context.Context) error {
