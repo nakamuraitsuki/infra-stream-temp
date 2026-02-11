@@ -7,27 +7,21 @@ import (
 )
 
 type TranscodingRequested struct {
-	id         uuid.UUID
-	VideoID    uuid.UUID
-	occurredAt time.Time
+	// 全て大文字開始にして JSON タグを付与する（Marshal 時に無視されないようにするため）
+	EventID     uuid.UUID `json:"id"`
+	VideoID     uuid.UUID `json:"video_id"`
+	Timestamp   time.Time `json:"occurred_at"`
 }
 
-func NewTranscodingRequested(videoID uuid.UUID) Event {
+func NewTranscodingRequested(videoID uuid.UUID) *TranscodingRequested {
 	return &TranscodingRequested{
-		id:         uuid.New(),
-		VideoID:    videoID,
-		occurredAt: time.Now(),
+		EventID:   uuid.New(),
+		VideoID:   videoID,
+		Timestamp: time.Now(),
 	}
 }
 
-func (e *TranscodingRequested) ID() uuid.UUID {
-	return e.id
-}
-
-func (e *TranscodingRequested) EventType() string {
-	return "video.transcoding_requested"
-}
-
-func (e *TranscodingRequested) OccurredAt() time.Time {
-	return e.occurredAt
-}
+// インターフェースを満たすためのメソッド
+func (e *TranscodingRequested) ID() uuid.UUID       { return e.EventID }
+func (e *TranscodingRequested) EventType() string  { return "video.transcoding_requested" }
+func (e *TranscodingRequested) OccurredAt() time.Time { return e.Timestamp }
