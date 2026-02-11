@@ -17,7 +17,11 @@ func (h *TranscodeHandler) Handle(ctx context.Context, meta job.Metadata, payloa
 		return err
 	}
 
-	err := h.UseCase.Handle(ctx, p.VideoID)
+	err := h.UseCase.Handle(
+		ctx,
+		p.VideoID,
+		meta.Attempt+1 >= meta.MaxRetry,
+	)
 	if err != nil {
 		if meta.Attempt >= meta.MaxRetry {
 			return nil
