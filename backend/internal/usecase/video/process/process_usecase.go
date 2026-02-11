@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"example.com/m/internal/domain/video"
+	"example.com/m/internal/usecase/tx"
 	"github.com/google/uuid"
 )
 
@@ -13,16 +14,19 @@ type VideoProcessUseCaseInterface interface {
 }
 
 type VideoProcessUseCase struct {
-	VideoRepo video.Repository
+	VideoRepo  video.Repository
 	Transcoder video.Transcoder
+	UoW        tx.UnitOfWork
 }
 
 func NewVideoProcessUseCase(
 	videoRepo video.Repository,
 	transcoder video.Transcoder,
+	uow tx.UnitOfWork,
 ) VideoProcessUseCaseInterface {
 	return &VideoProcessUseCase{
 		VideoRepo:  videoRepo,
 		Transcoder: transcoder,
+		UoW:        uow,
 	}
 }
