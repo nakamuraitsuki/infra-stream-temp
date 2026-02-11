@@ -18,7 +18,7 @@ func (h *Handler) Register(c echo.Context) error {
 
 	var req RegisterRequest
 	if err := c.Bind(&req); err != nil {
-		return err
+		return echo.NewHTTPError(400, err.Error())
 	}
 
 	ctx := c.Request().Context()
