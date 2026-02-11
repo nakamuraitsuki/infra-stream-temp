@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"example.com/m/internal/domain/event"
 	video_domain "example.com/m/internal/domain/video"
 	video_value "example.com/m/internal/domain/video/value"
 	"github.com/google/uuid"
@@ -57,6 +58,7 @@ func (uc *VideoManagementUseCase) Create(
 		tags,
 		visibility,
 		time.Now(),
+		[]event.Event{},
 	)
 
 	if err := uc.VideoRepo.Save(ctx, video); err != nil {
