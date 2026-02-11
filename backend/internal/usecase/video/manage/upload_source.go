@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc *VideoManagementUseCase) UploadSource(
+func (uc *VideoManagementUseCase) UploadAndStartTranscoding(
 	ctx context.Context,
 	videoID uuid.UUID,
 	videoData io.Reader,
@@ -18,7 +18,7 @@ func (uc *VideoManagementUseCase) UploadSource(
 		"videos/%s/source",
 		videoID.String(),
 	)
-	
+
 	err := uc.UoW.Do(ctx, func(ctx context.Context) error {
 		video, err := uc.VideoRepo.FindByID(ctx, videoID)
 		if err != nil {
@@ -33,7 +33,20 @@ func (uc *VideoManagementUseCase) UploadSource(
 			return err
 		}
 
-		return uc.VideoRepo.Save(ctx, video)
+		streamKey := fmt.Sprintf(
+			"videos/%s/stream",
+			videoID.String(),
+		)
+		if err = video.StartTranscoding(streamKey); err != nil {
+			return err
+		}
+
+		if err = uc.VideoRepo.Save(ctx, video); err != nil {
+			return err
+		}
+
+		ev := video.PullEvents()
+		return uc.OutboxRepo.Save(ctx, ev)
 	})
 
 	if err != nil {

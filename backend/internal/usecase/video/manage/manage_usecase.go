@@ -21,11 +21,8 @@ type VideoManagementUseCaseInterface interface {
 		tags []string,
 	) (*CreateResponse, error)
 
-	// UploadSource uploads the raw video data for the specified video.
-	UploadSource(ctx context.Context, videoID uuid.UUID, videoData io.Reader) error
-
-	// StartTranscoding initiates the transcoding process for a video.
-	StartTranscoding(ctx context.Context, videoID uuid.UUID) error
+	// UploadAndStartTranscoding uploads the raw video data and starts the transcoding process.
+	UploadAndStartTranscoding(ctx context.Context, videoID uuid.UUID, videoData io.Reader) error
 
 	// ListMine returns a list of videos owned by the specified user.
 	ListMine(ctx context.Context, ownerID uuid.UUID, query query.VideoSearchQuery) (*ListMineResults, error)
