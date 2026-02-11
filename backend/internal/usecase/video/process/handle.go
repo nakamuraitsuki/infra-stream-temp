@@ -35,6 +35,7 @@ func (uc *VideoProcessUseCase) Handle(ctx context.Context, videoID uuid.UUID, is
 	video.MarkTranscodeSucceeded()
 	if err := uc.VideoRepo.Save(ctx, video); err != nil {
 		log.Println("failed to save video after transcoding:", err)
+		return err
 	}
 	return nil
 }
