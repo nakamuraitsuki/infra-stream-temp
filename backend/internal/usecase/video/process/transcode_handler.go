@@ -11,6 +11,7 @@ type TranscodeHandler struct {
 	UseCase VideoProcessUseCaseInterface
 }
 
+// Handle は、Consumerが呼び出せるようにUseCaseをラップする。
 func (h *TranscodeHandler) Handle(ctx context.Context, meta job.Metadata, payload []byte) error {
 	var p TranscodePayload
 	if err := json.Unmarshal(payload, &p); err != nil {
