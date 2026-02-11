@@ -19,6 +19,10 @@ func (uc *VideoManagementUseCase) UploadAndStartTranscoding(
 		videoID.String(),
 	)
 
+	if err := uc.Storage.SaveSource(ctx, sourceKey, videoData); err != nil {
+		return err
+	}
+
 	err := uc.UoW.Do(ctx, func(ctx context.Context) error {
 		video, err := uc.VideoRepo.FindByID(ctx, videoID)
 		if err != nil {
