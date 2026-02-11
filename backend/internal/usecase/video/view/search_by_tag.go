@@ -51,10 +51,15 @@ func (uc *VideoViewingUseCase) SearchByTag(
 
 	results := make([]*GetByTagsResult, len(videos))
 	for i, video := range videos {
+		tagsStr := make([]string, len(video.Tags()))
+		for j, t := range video.Tags() {
+			tagsStr[j] = string(t)
+		}
 		results[i] = &GetByTagsResult{
 			ID:          video.ID(),
 			Title:       video.Title(),
 			Description: video.Description(),
+			Tags:        tagsStr,
 			OwnerID:     video.OwnerID(),
 			CreatedAt:   video.CreatedAt(),
 		}
