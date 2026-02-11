@@ -31,5 +31,9 @@ func (h *VideoManagementHandler) UploadSource(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to upload video source")
 	}
 
+	if err := h.manageUsecase.StartTranscoding(ctx, videoID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to start transcoding")
+	}
+
 	return c.NoContent(http.StatusNoContent)
 }

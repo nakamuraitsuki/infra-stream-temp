@@ -19,4 +19,5 @@ func RegisterRoutes(e *echo.Echo, mh *manager.VideoManagementHandler, vh *viewer
 
 	videos.POST("", mh.Create)
 	videos.GET("/mine", mh.ListMine)
+	videos.POST("/:id/source", mh.UploadSource)
 }
