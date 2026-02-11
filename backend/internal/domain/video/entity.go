@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"example.com/m/internal/domain/event"
 	"example.com/m/internal/domain/video/value"
 	"github.com/google/uuid"
 )
@@ -21,6 +22,7 @@ type Video struct {
 	failureReason *value.FailureReason
 	visibility    value.Visibility
 	createdAt     time.Time
+	events        []event.Event
 }
 
 func NewVideo(
@@ -34,6 +36,7 @@ func NewVideo(
 	tags []value.Tag,
 	visibility value.Visibility,
 	createdAt time.Time,
+	events []event.Event,
 ) *Video {
 	return &Video{
 		id:          id,
@@ -46,6 +49,7 @@ func NewVideo(
 		tags:        tags,
 		visibility:  visibility,
 		createdAt:   createdAt,
+		events:      events,
 	}
 }
 
@@ -67,6 +71,12 @@ func (v *Video) Description() string {
 
 func (v *Video) Tags() []value.Tag {
 	return v.tags
+}
+
+func (v *Video) PullEvents() []event.Event {
+	events := v.events
+	v.events = nil
+	return events
 }
 
 func (v *Video) CreatedAt() time.Time {
@@ -104,6 +114,7 @@ func (v *Video) StartTranscoding(streamKey string) error {
 	}
 	v.streamKey = streamKey
 	v.status = value.StatusProcessing
+	v.events = append(v.events, event.NewTranscodingRequested(v.id))
 	return nil
 }
 
