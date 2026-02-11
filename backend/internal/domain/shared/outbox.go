@@ -8,7 +8,7 @@ import (
 )
 
 type OutboxRepository interface {
-	Save(ctx context.Context, event event.Event) error
+	Save(ctx context.Context, events []event.Event) error
 
 	ListUnpublished(ctx context.Context, limit int) ([]event.Event, error)
 

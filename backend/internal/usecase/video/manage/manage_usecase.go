@@ -4,8 +4,8 @@ import (
 	"context"
 	"io"
 
+	"example.com/m/internal/domain/shared"
 	video_domain "example.com/m/internal/domain/video"
-	"example.com/m/internal/usecase/job"
 	"example.com/m/internal/usecase/tx"
 	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
@@ -33,24 +33,24 @@ type VideoManagementUseCaseInterface interface {
 
 type VideoManagementUseCase struct {
 	VideoRepo  video_domain.Repository
+	OutboxRepo shared.OutboxRepository
 	Storage    video_domain.Storage
 	Transcoder video_domain.Transcoder
 	UoW        tx.UnitOfWork
-	JobQueue   job.Queue
 }
 
 func NewVideoManagementUseCase(
 	videoRepo video_domain.Repository,
+	outboxRepo shared.OutboxRepository,
 	storage video_domain.Storage,
 	transcoder video_domain.Transcoder,
 	uow tx.UnitOfWork,
-	jobQueue job.Queue,
 ) VideoManagementUseCaseInterface {
 	return &VideoManagementUseCase{
 		VideoRepo:  videoRepo,
+		OutboxRepo: outboxRepo,
 		Storage:    storage,
 		Transcoder: transcoder,
 		UoW:        uow,
-		JobQueue:   jobQueue,
 	}
 }
