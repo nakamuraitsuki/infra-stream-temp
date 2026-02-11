@@ -55,5 +55,17 @@ func (uc *VideoManagementUseCase) StartTranscoding(
 		CreatedAt: time.Now(),
 	}
 
-	return uc.JobQueue.Enqueue(ctx, meta, data)
+	err = uc.JobQueue.Enqueue(ctx, meta, data)
+	if err != nil {
+		// ジョブの登録に失敗したら動画の状態をアップロード済みに戻す
+		if rollbackErr := video.RollbackToUploaded(); rollbackErr != nil {
+			return fmt.Errorf("failed to enqueue job: %v; also failed to rollback video status: %v", err, rollbackErr)
+		}
+		if saveErr := uc.VideoRepo.Save(ctx, video); saveErr != nil {
+			return fmt.Errorf("failed to enqueue job: %v; also failed to save rolled back video status: %v", err, saveErr)
+		}
+		return err
+	}
+
+	return nil
 }

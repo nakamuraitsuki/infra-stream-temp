@@ -107,6 +107,14 @@ func (v *Video) StartTranscoding(streamKey string) error {
 	return nil
 }
 
+func (v *Video) RollbackToUploaded() error {
+	if v.status != value.StatusProcessing {
+		return errors.New("video is not in processing state")
+	}
+	v.status = value.StatusUploaded
+	return nil
+}
+
 func (v *Video) MarkTranscodeSucceeded() {
 	v.status = value.StatusReady
 	v.failureReason = nil
