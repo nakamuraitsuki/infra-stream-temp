@@ -33,10 +33,16 @@ func (uc *EventRelayUseCase) ProcessOutbox(ctx context.Context) error {
 		return err
 	}
 
+	var firstErr error
+
 	for _, ev := range events {
-		payload, err := json.Marshal(ev)
+
+		payload, err := json.Marshal(ev.Payload())
 		if err != nil {
-			continue // 失敗したら次は飛ばす（リトライは次回）
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
 		}
 
 		meta := job.Metadata{
@@ -46,12 +52,20 @@ func (uc *EventRelayUseCase) ProcessOutbox(ctx context.Context) error {
 			MaxRetry:  3,
 			CreatedAt: ev.OccurredAt(),
 		}
+
 		if err := uc.JobQueue.Enqueue(ctx, meta, payload); err != nil {
-			continue // 失敗したら次は飛ばす（リトライは次回）
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
 		}
 
-		// 3. 送信済みマーク
-		_ = uc.OutboxRepo.MarkAsPublished(ctx, ev.ID())
+		if err := uc.OutboxRepo.MarkAsPublished(ctx, ev.ID()); err != nil {
+			// これは致命的
+			return err
+		}
 	}
-	return nil
+
+	return firstErr
 }
+

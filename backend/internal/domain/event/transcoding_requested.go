@@ -13,7 +13,7 @@ type TranscodingRequested struct {
 	Timestamp   time.Time `json:"occurred_at"`
 }
 
-func NewTranscodingRequested(videoID uuid.UUID) *TranscodingRequested {
+func NewTranscodingRequested(videoID uuid.UUID) Event {
 	return &TranscodingRequested{
 		EventID:   uuid.New(),
 		VideoID:   videoID,
@@ -25,3 +25,8 @@ func NewTranscodingRequested(videoID uuid.UUID) *TranscodingRequested {
 func (e *TranscodingRequested) ID() uuid.UUID       { return e.EventID }
 func (e *TranscodingRequested) EventType() string  { return "video.transcoding_requested" }
 func (e *TranscodingRequested) OccurredAt() time.Time { return e.Timestamp }
+func (e *TranscodingRequested) Payload() any {
+	return map[string]uuid.UUID{
+		"video_id": e.VideoID,
+	}
+}
