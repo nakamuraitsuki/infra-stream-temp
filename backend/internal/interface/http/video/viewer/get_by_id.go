@@ -3,6 +3,7 @@ package viewer
 import (
 	"net/http"
 
+	view_usecase "example.com/m/internal/usecase/video/view"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -28,7 +29,14 @@ func (h *VideoViewingHandler) GetByID(c echo.Context) error {
 
 	result, err := h.usecase.GetByID(ctx, videoID)
 	if err != nil {
-		return echo.ErrInternalServerError
+		switch err {
+			case view_usecase.ErrVideoNotReady:
+				return echo.NewHTTPError(http.StatusNotFound, "video is not ready for playback")
+			case view_usecase.ErrVideoForbidden:
+				return echo.NewHTTPError(http.StatusForbidden, "video is not accessible")
+			default:
+				return echo.ErrInternalServerError
+		}
 	}
 
 	resp := GetByIDResponse{

@@ -27,6 +27,14 @@ func (uc *VideoViewingUseCase) GetByID(
 		return nil, err
 	}
 
+	if video.Status() != "ready" {
+		return nil, ErrVideoNotReady
+	}
+
+	if video.Visibility() != "public" {
+		return nil, ErrVideoForbidden
+	}
+
 	tagsStr := make([]string, len(video.Tags()))
 	for i, tag := range video.Tags() {
 		tagsStr[i] = string(tag)
