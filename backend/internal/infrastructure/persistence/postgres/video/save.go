@@ -37,7 +37,7 @@ ON CONFLICT (id) DO UPDATE SET
 	}
 
 	const deleteTagsQuery = `DELETE FROM video_tags WHERE video_id = $1`
-	if _, err := db.ExecContext(ctx, deleteTagsQuery, v.ID); err != nil {
+	if _, err := db.ExecContext(ctx, deleteTagsQuery, v.ID()); err != nil {
 		return fmt.Errorf("failed to delete existing video tags: %w", err)
 	}
 
@@ -60,7 +60,7 @@ SELECT $2, id FROM inserted_tags
 			tagNames[i] = string(tag)
 		}
 
-		if _, err := db.ExecContext(ctx, syncTagsQuery, tagNames, v.ID); err != nil {
+		if _, err := db.ExecContext(ctx, syncTagsQuery, tagNames, v.ID()); err != nil {
 			return fmt.Errorf("failed to sync video tags: %w", err)
 		}
 	}
