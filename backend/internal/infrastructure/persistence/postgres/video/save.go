@@ -42,6 +42,9 @@ ON CONFLICT (id) DO UPDATE SET
 	}
 
 	if len(v.Tags()) > 0 {
+		// NOTE: 多対多を１クエリで解決する（postgres特有）
+		//       Tagsテーブルに、もし新規がある場合は登録してから一覧を取得
+		//       それをもとにvideoとの紐付けを更新する
 		const syncTagsQuery = `
 WITH inserted_tags AS (
 	INSERT INTO tags (name)

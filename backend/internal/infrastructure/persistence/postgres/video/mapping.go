@@ -26,6 +26,12 @@ type videoModel struct {
 	// event は Outbox パターンで使用するため除外
 }
 
+// 構造として明示的に定義しておく（クエリで暗黙的に使われていても）
+type videoTagModel struct {
+	VideoID uuid.UUID `db:"video_id"`
+	TagID   uuid.UUID `db:"tag_id"`
+}
+
 func fromEntity(v *video_domain.Video) *videoModel {
 	var failureReason *string
 	if v.FailureReason() != nil {
@@ -90,6 +96,7 @@ func (m *videoModel) toEntity() (*video_domain.Video, error) {
 		m.Title,
 		m.Description,
 		tags,
+		m.RetryCount,
 		failureReason,
 		visibility,
 		m.CreatedAt,
