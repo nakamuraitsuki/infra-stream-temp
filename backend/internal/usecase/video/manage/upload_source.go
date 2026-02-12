@@ -38,7 +38,7 @@ func (uc *VideoManagementUseCase) UploadAndStartTranscoding(
 		}
 
 		streamKey := fmt.Sprintf(
-			"videos/%s/stream",
+			"videos/%s/stream/",
 			videoID.String(),
 		)
 		if err = video.StartTranscoding(streamKey); err != nil {
