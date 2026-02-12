@@ -1,5 +1,7 @@
 package value
 
+import "errors"
+
 type Status string
 
 const (
@@ -10,3 +12,21 @@ const (
 	StatusReady      Status = "ready"      // 再生可能
 	StatusFailed     Status = "failed"     // 処理失敗
 )
+
+var (
+	ErrInvalidStatus = errors.New("invalid status")
+)
+
+func NewStatus(s string) (Status, error) {
+	switch s {
+	case string(StatusInitial),
+		string(StatusUploaded),
+		string(StatusQueued),
+		string(StatusProcessing),
+		string(StatusReady),
+		string(StatusFailed):
+		return Status(s), nil
+	default:
+		return "", ErrInvalidStatus
+	}
+}

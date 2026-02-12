@@ -34,6 +34,7 @@ func NewVideo(
 	title string,
 	description string,
 	tags []value.Tag,
+	failerureReason *value.FailureReason,
 	visibility value.Visibility,
 	createdAt time.Time,
 	events []event.Event,
@@ -47,6 +48,8 @@ func NewVideo(
 		title:       title,
 		description: description,
 		tags:        tags,
+		retryCount:  len(events), // イベント数をリトライ回数とする
+		failureReason: failerureReason,
 		visibility:  visibility,
 		createdAt:   createdAt,
 		events:      events,
@@ -71,6 +74,14 @@ func (v *Video) Description() string {
 
 func (v *Video) Tags() []value.Tag {
 	return v.tags
+}
+
+func (v *Video) RetryCount() int {
+	return v.retryCount
+}
+
+func (v *Video) FailureReason() *value.FailureReason {
+	return v.failureReason
 }
 
 func (v *Video) PullEvents() []event.Event {
