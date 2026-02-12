@@ -64,6 +64,6 @@ SELECT $2, id FROM inserted_tags
 			return fmt.Errorf("failed to sync video tags: %w", err)
 		}
 	}
-	
+
 	return nil
 }

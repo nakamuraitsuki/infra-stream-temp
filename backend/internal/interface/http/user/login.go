@@ -3,9 +3,9 @@ package user
 import (
 	"net/http"
 
+	"example.com/m/internal/interface/http/middleware"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"example.com/m/internal/interface/http/middleware"
 )
 
 type DummyLoginResponse struct {

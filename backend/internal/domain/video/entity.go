@@ -41,19 +41,19 @@ func NewVideo(
 	events []event.Event,
 ) *Video {
 	return &Video{
-		id:          id,
-		ownerID:     ownerID,
-		sourceKey:   sourceKey,
-		streamKey:   streamKey,
-		status:      status,
-		title:       title,
-		description: description,
-		tags:        tags,
-		retryCount:  retryCount,
+		id:            id,
+		ownerID:       ownerID,
+		sourceKey:     sourceKey,
+		streamKey:     streamKey,
+		status:        status,
+		title:         title,
+		description:   description,
+		tags:          tags,
+		retryCount:    retryCount,
 		failureReason: failureReason,
-		visibility:  visibility,
-		createdAt:   createdAt,
-		events:      events,
+		visibility:    visibility,
+		createdAt:     createdAt,
+		events:        events,
 	}
 }
 

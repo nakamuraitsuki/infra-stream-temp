@@ -1,8 +1,8 @@
 package user
 
 import (
-	"github.com/jmoiron/sqlx"
 	user_domain "example.com/m/internal/domain/user"
+	"github.com/jmoiron/sqlx"
 )
 
 // 小文字で開始し、このパッケージ内に閉じ込める

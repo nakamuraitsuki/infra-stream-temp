@@ -34,7 +34,7 @@ VALUES (?)
 	}
 
 	// NOTE: sqlx.In はプレースホルダを "?" で生成する
-	// 			 PostgreSQL では "$1", "$2", ... の形式が必要なため、Rebind 
+	// 			 PostgreSQL では "$1", "$2", ... の形式が必要なため、Rebind
 	q = r.db.Rebind(q)
 
 	if _, err := db.ExecContext(ctx, q, args...); err != nil {

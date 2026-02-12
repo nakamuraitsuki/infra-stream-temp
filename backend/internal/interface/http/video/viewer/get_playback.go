@@ -25,12 +25,12 @@ func (h *VideoViewingHandler) GetPlaybackInfo(c echo.Context) error {
 	info, err := h.usecase.GetPlaybackInfo(ctx, videoID)
 	if err != nil {
 		switch err {
-			case view.ErrVideoNotReady:
-				return echo.NewHTTPError(http.StatusConflict, "video not ready")
-			case view.ErrVideoForbidden:
-				return echo.NewHTTPError(http.StatusForbidden, "video is not public")
-			default:
-				return echo.NewHTTPError(http.StatusInternalServerError, "failed to get playback info")
+		case view.ErrVideoNotReady:
+			return echo.NewHTTPError(http.StatusConflict, "video not ready")
+		case view.ErrVideoForbidden:
+			return echo.NewHTTPError(http.StatusForbidden, "video is not public")
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get playback info")
 		}
 	}
 

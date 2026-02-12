@@ -32,7 +32,7 @@ func (t *Transactor) Do(
 	if err := fn(txCtx); err != nil {
 		if rollBackErr := tx.Rollback(); rollBackErr != nil {
 			return fmt.Errorf(
-				"rollback failed: %v (original error: %w)", 
+				"rollback failed: %v (original error: %w)",
 				rollBackErr,
 				err,
 			)
