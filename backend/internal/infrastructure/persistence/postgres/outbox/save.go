@@ -25,20 +25,12 @@ func (r *outboxRepository) Save(ctx context.Context, events []event.Event) error
 	}
 
 	const query = `
-INSERT INTO outbox (id, event_type, payload, occurred_at)
-VALUES (?)	
-`
-	q, args, err := sqlx.In(query, models)
-	if err != nil {
-		return fmt.Errorf("failed to build query: %w", err)
-	}
+		INSERT INTO outbox (id, event_type, payload, occurred_at)
+		VALUES (:id, :event_type, :payload, :occurred_at)
+	`
 
-	// NOTE: sqlx.In はプレースホルダを "?" で生成する
-	// 			 PostgreSQL では "$1", "$2", ... の形式が必要なため、Rebind
-	q = r.db.Rebind(q)
-
-	if _, err := db.ExecContext(ctx, q, args...); err != nil {
-		return fmt.Errorf("failed to execute query: %w", err)
+	if _, err := sqlx.NamedExecContext(ctx, db, query, models); err != nil {
+		return fmt.Errorf("failed to execute bulk insert query: %w", err)
 	}
 
 	return nil
