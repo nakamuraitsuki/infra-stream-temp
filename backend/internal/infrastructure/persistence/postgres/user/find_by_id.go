@@ -22,8 +22,8 @@ FROM
 WHERE id = $1
 `
 
-	var dao userDAO
-	err := db.GetContext(ctx, &dao, query, id)
+	var model userModel
+	err := db.GetContext(ctx, &model, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("failed to find user by id: %w", err)
@@ -31,5 +31,5 @@ WHERE id = $1
 		return nil, fmt.Errorf("failed to find user by id: %w", err)
 	}
 
-	return dao.toEntity()
+	return model.toEntity()
 }

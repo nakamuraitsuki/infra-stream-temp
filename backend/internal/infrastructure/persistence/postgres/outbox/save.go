@@ -15,20 +15,20 @@ func (r *outboxRepository) Save(ctx context.Context, events []event.Event) error
 	}
 	db := postgres.GetExt(ctx, r.db)
 
-	dtos := make([]*outboxDTO, len(events))
+	models := make([]*outboxModel, len(events))
 	for i, e := range events {
 		m, err := fromEntity(e)
 		if err != nil {
 			return fmt.Errorf("failed to map event to outbox DTO: %w", err)
 		}
-		dtos[i] = m
+		models[i] = m
 	}
 
 	const query = `
 INSERT INTO outbox (id, event_type, payload, occurred_at)
 VALUES (?)	
 `
-	q, args, err := sqlx.In(query, dtos)
+	q, args, err := sqlx.In(query, models)
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}

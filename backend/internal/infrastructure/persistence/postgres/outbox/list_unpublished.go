@@ -16,14 +16,14 @@ FROM outbox
 ORDER BY occurred_at ASC
 LIMIT $1	
 `
-	var dtos []outboxDTO
-	if err := db.SelectContext(ctx, &dtos, query, limit); err != nil {
+	var models []outboxModel
+	if err := db.SelectContext(ctx, &models, query, limit); err != nil {
 		return nil, err
 	}
 
-	entries := make([]shared.OutboxEntry, len(dtos))
-	for i, dto := range dtos {
-		entry, err := dto.toEntry()
+	entries := make([]shared.OutboxEntry, len(models))
+	for i, model := range models {
+		entry, err := model.toEntry()
 		if err != nil {
 			return nil, err
 		}

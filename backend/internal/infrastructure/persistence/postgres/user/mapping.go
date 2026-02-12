@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type userDAO struct {
+type userModel struct {
 	ID        uuid.UUID `db:"id"`
 	Name      string    `db:"name"`
 	Bio       string    `db:"bio"`
@@ -17,8 +17,8 @@ type userDAO struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
-func fromEntity(u *user_domain.User) *userDAO {
-	return &userDAO{
+func fromEntity(u *user_domain.User) *userModel {
+	return &userModel{
 		ID:        u.ID(),
 		Name:      u.Name(),
 		Bio:       u.Bio(),
@@ -30,13 +30,13 @@ func fromEntity(u *user_domain.User) *userDAO {
 
 // toEntity は Userのコンストラクタのラッパー
 // DB特有の不正値のチェックなどをしたい場合に追記する
-func (dao *userDAO) toEntity() (*user_domain.User, error) {
+func (m *userModel) toEntity() (*user_domain.User, error) {
 	return user_domain.NewUser(
-		dao.ID,
-		dao.Name,
-		dao.Bio,
-		dao.IconKey,
-		user_value.Role(dao.Role),
-		dao.CreatedAt,
+		m.ID,
+		m.Name,
+		m.Bio,
+		m.IconKey,
+		user_value.Role(m.Role),
+		m.CreatedAt,
 	), nil
 }
