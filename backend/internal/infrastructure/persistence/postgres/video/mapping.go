@@ -28,7 +28,7 @@ type videoModel struct {
 
 // 構造として明示的に定義しておく（クエリで暗黙的に使われていても）
 type videoTagModel struct {
-	VideoID int64 `db:"video_id"`
+	VideoID int64     `db:"video_id"`
 	TagID   uuid.UUID `db:"tag_id"`
 }
 
