@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     display_name VARCHAR(100) NOT NULL,
     icon_key TEXT,
     role VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 -- 2. Videos Table
@@ -22,8 +21,7 @@ CREATE TABLE IF NOT EXISTS videos (
     retry_count INTEGER NOT NULL DEFAULT 0,
     failure_reason TEXT,
     visibility VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 -- 3. Tags Master Table
