@@ -17,10 +17,10 @@ func (r *videoRepository) Save(ctx context.Context, v *video_domain.Video) error
 	const upsertVideoQuery = `
 INSERT INTO videos (
 	id, owner_id, source_key, stream_key, status, title,
-	description, retry_count, failure_reason, visibility, created_at, updated_at
+	description, retry_count, failure_reason, visibility, created_at
 ) VALUES (
 	:id, :owner_id, :source_key, :stream_key, :status, :title,
-	:description, :retry_count, :failure_reason, :visibility, :created_at, :updated_at
+	:description, :retry_count, :failure_reason, :visibility, :created_at
 )
 ON CONFLICT (id) DO UPDATE SET
 	source_key = EXCLUDED.source_key,

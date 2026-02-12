@@ -1,15 +1,14 @@
--- 1. Users Table (Bioを追加、Name/DisplayNameの整合性を修正)
+-- 1. Users Table
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,     -- userModel.Name に準拠
-    bio TEXT NOT NULL DEFAULT '',   -- userModel.Bio に準拠
-    icon_key TEXT,                  -- *string (NULL許容)
+    name VARCHAR(255) NOT NULL,     
+    bio TEXT NOT NULL DEFAULT '', 
+    icon_key TEXT,                  
     role VARCHAR(50) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL
-    -- PasswordHash/Email等はドメイン層の構成に合わせて必要なら追加してください
 );
 
--- 2. Videos Table (updated_atを削除しDTOに準拠)
+-- 2. Videos Table
 CREATE TABLE IF NOT EXISTS videos (
     id UUID PRIMARY KEY,
     owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -19,7 +18,7 @@ CREATE TABLE IF NOT EXISTS videos (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     retry_count INTEGER NOT NULL DEFAULT 0,
-    failure_reason TEXT,            -- *string (NULL許容)
+    failure_reason TEXT,         
     visibility VARCHAR(50) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );

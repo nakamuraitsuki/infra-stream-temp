@@ -19,7 +19,7 @@ func (r *videoRepository) FindByID(ctx context.Context, id uuid.UUID) (*video_do
 SELECT 
 	v.id, v.owner_id, v.source_key, v.stream_key, v.status,
 	v.title, v.description, v.retry_count, v.failure_reason,
-	v.created_at, v.updated_at,
+	v.created_at,
 	array_remove(array_agg(t.name), NULL) as tags
 FROM videos v
 LEFT JOIN video_tags vt ON v.id = vt.video_id
