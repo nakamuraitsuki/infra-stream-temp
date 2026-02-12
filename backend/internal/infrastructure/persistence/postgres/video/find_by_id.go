@@ -30,7 +30,7 @@ GROUP BY v.id
 	var m videoModel
 	if err := db.GetContext(ctx, &m, query, id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("video not found %w", err)
+			return nil, fmt.Errorf("video not found: %w", err)
 		}
 		return nil, fmt.Errorf("failed to find video by id: %w", err)
 	}
