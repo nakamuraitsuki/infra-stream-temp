@@ -2,7 +2,6 @@ package event
 
 import (
 	"context"
-	"encoding/json"
 
 	"example.com/m/internal/domain/shared"
 	"example.com/m/internal/usecase/job"
@@ -28,39 +27,31 @@ func NewEventRelayUseCase(
 }
 
 func (uc *EventRelayUseCase) ProcessOutbox(ctx context.Context) error {
-	events, err := uc.OutboxRepo.ListUnpublished(ctx, 10)
+	entries, err := uc.OutboxRepo.ListUnpublished(ctx, 10)
 	if err != nil {
 		return err
 	}
 
 	var firstErr error
 
-	for _, ev := range events {
-
-		payload, err := json.Marshal(ev.Payload())
-		if err != nil {
-			if firstErr == nil {
-				firstErr = err
-			}
-			continue
-		}
+	for _, entry := range entries {
 
 		meta := job.Metadata{
-			ID:        ev.ID(),
-			Type:      ev.EventType(),
+			ID:        entry.ID,
+			Type:      entry.EventType,
 			Attempt:   0,
 			MaxRetry:  3,
-			CreatedAt: ev.OccurredAt(),
+			CreatedAt: entry.OccurredAt,
 		}
 
-		if err := uc.JobQueue.Enqueue(ctx, meta, payload); err != nil {
+		if err := uc.JobQueue.Enqueue(ctx, meta, entry.Payload); err != nil {
 			if firstErr == nil {
 				firstErr = err
 			}
 			continue
 		}
 
-		if err := uc.OutboxRepo.MarkAsPublished(ctx, ev.ID()); err != nil {
+		if err := uc.OutboxRepo.MarkAsPublished(ctx, entry.ID); err != nil {
 			// これは致命的
 			return err
 		}
@@ -68,4 +59,3 @@ func (uc *EventRelayUseCase) ProcessOutbox(ctx context.Context) error {
 
 	return firstErr
 }
-

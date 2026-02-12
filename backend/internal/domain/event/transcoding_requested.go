@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Domain Model 内で使用するイベントの定義
 type TranscodingRequested struct {
 	// 全て大文字開始にして JSON タグを付与する（Marshal 時に無視されないようにするため）
 	EventID     uuid.UUID `json:"id"`
@@ -26,7 +27,5 @@ func (e *TranscodingRequested) ID() uuid.UUID       { return e.EventID }
 func (e *TranscodingRequested) EventType() string  { return "video.transcoding_requested" }
 func (e *TranscodingRequested) OccurredAt() time.Time { return e.Timestamp }
 func (e *TranscodingRequested) Payload() any {
-	return map[string]uuid.UUID{
-		"video_id": e.VideoID,
-	}
+	return e
 }
