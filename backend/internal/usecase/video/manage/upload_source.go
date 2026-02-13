@@ -38,7 +38,7 @@ func (uc *VideoManagementUseCase) UploadAndStartTranscoding(
 		}
 
 		streamKey := fmt.Sprintf(
-			"videos/%s/stream",
+			"videos/%s/stream/",
 			videoID.String(),
 		)
 		if err = video.StartTranscoding(streamKey); err != nil {
@@ -55,7 +55,7 @@ func (uc *VideoManagementUseCase) UploadAndStartTranscoding(
 
 	if err != nil {
 		// DBが失敗した時だけ、保存してしまったファイルを消す
-		_ = uc.Storage.Delete(ctx, sourceKey)
+		_ = uc.Storage.DeleteSource(ctx, sourceKey)
 		return err
 	}
 

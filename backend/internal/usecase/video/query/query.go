@@ -6,3 +6,8 @@ type VideoSearchQuery struct {
 	Limit int
 	// add more fields as needed
 }
+
+type VideoRangeQuery struct {
+	Start int64
+	End   *int64 // nil means until the end of the file
+}
