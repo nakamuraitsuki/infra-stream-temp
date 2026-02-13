@@ -113,7 +113,13 @@ func (v *VideoViewingHandler) parseRangeHeader(r string) (*query.VideoRangeQuery
 		return nil, echo.ErrBadRequest
 	}
 
-	parts := strings.Split(strings.TrimPrefix(r, "bytes="), "-")
+	rangeSpec := strings.TrimPrefix(r, "bytes=")
+	// Explicitly reject multipart byte ranges such as "bytes=0-499,1000-1499".
+	if strings.Contains(rangeSpec, ",") {
+		return nil, echo.ErrBadRequest
+	}
+
+	parts := strings.Split(rangeSpec, "-")
 	if len(parts) != 2 {
 		return nil, echo.ErrBadRequest
 	}
