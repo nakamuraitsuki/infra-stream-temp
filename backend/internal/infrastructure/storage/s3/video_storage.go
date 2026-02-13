@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 	"time"
 
 	"example.com/m/internal/domain/video"
@@ -38,35 +37,57 @@ func (s *videoStorage) GenerateTemporaryAccessURL(ctx context.Context, streamKey
 	return "", nil
 }
 
-// GetStream 一時ファイル作成　io.ReadSeekerで返す
-func (s *videoStorage) GetStream(ctx context.Context, streamKey string) (io.ReadSeeker, error) {
-	output, err := s.client.GetObject(ctx, &s3.GetObjectInput{
+func (s *videoStorage) GetStream(ctx context.Context, streamKey string, byteRange *video.ByteRange) (io.ReadCloser, *video.ObjectMeta, error) {
+	input := &s3.GetObjectInput{
 		Bucket: aws.String(s.bucketName),
 		Key:    aws.String(streamKey),
-	})
+	}
+
+	if byteRange != nil {
+		if byteRange.End != nil {
+			input.Range = aws.String(
+				fmt.Sprintf("bytes=%d-%d", byteRange.Start, *byteRange.End),
+			)
+		} else {
+			input.Range = aws.String(
+				fmt.Sprintf("bytes=%d-", byteRange.Start),
+			)
+		}
+	}
+
+	out, err := s.client.GetObject(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get stream from s3: %w", err)
-	}
-	defer output.Body.Close()
-
-	tmpFile, err := os.CreateTemp("", "video-stream-*.tmp")
-	if err != nil {
-		return nil, fmt.Errorf("failed to create temp file: %w", err)
+		return nil, nil, err
 	}
 
-	if _, err := io.Copy(tmpFile, output.Body); err != nil {
-		tmpFile.Close()
-		os.Remove(tmpFile.Name())
-		return nil, fmt.Errorf("failed to copy to temp file: %w", err)
+	meta := &video.ObjectMeta{
+		ContentLength: aws.ToInt64(out.ContentLength),
+		ETag:          aws.ToString(out.ETag),
+		LastModified:  aws.ToTime(out.LastModified),
+	}
+	// Range 系の返答Metaをoutから組み立て
+	if out.ContentRange != nil {
+		// 例: "bytes 0-1023/5000000"
+		var start, end, total int64
+		_, err := fmt.Sscanf(
+			aws.ToString(out.ContentRange),
+			"bytes %d-%d/%d",
+			&start,
+			&end,
+			&total,
+		)
+		if err == nil {
+			meta.RangeStart = start
+			meta.RangeEnd = end
+			meta.TotalSize = total
+		}
+	} else {
+		meta.TotalSize = aws.ToInt64(out.ContentLength)
+		meta.RangeStart = 0
+		meta.RangeEnd = meta.TotalSize - 1
 	}
 
-	if _, err := tmpFile.Seek(0, io.SeekStart); err != nil {
-		tmpFile.Close()
-		os.Remove(tmpFile.Name())
-		return nil, fmt.Errorf("failed to seek temp file: %w", err)
-	}
-
-	return tmpFile, nil
+	return out.Body, meta, nil
 }
 
 func (s *videoStorage) DeleteSource(ctx context.Context, sourceKey string) error {
