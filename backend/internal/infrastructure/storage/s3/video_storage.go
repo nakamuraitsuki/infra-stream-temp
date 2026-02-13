@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"example.com/m/internal/domain/video"
@@ -29,11 +30,12 @@ func (s *videoStorage) SaveSource(ctx context.Context, sourceKey string, data io
 }
 
 func (s *videoStorage) SaveStream(ctx context.Context, streamKey string, data io.Reader) error {
-	// 拡張子から判断した方が良い
-	return s.upload(ctx, streamKey, data, "application/x-mpegURL")
+	contentType := s.detectContentType(streamKey)
+	return s.upload(ctx, streamKey, data, contentType)
 }
 
 func (s *videoStorage) GenerateTemporaryAccessURL(ctx context.Context, streamKey string, expiresDuration time.Duration) (string, error) {
+	panic("not implemented")
 	return "", nil
 }
 
@@ -144,4 +146,17 @@ func (s *videoStorage) upload(ctx context.Context, key string, data io.Reader, c
 	})
 
 	return err
+}
+
+func (s *videoStorage) detectContentType(key string) string {
+	switch {
+	case strings.HasSuffix(key, ".m3u8"):
+		return "application/vnd.apple.mpegurl"
+	case strings.HasSuffix(key, ".ts"):
+		return "video/mp2t"
+	case strings.HasSuffix(key, ".mp4"):
+		return "video/mp4"
+	default:
+		return "application/octet-stream"
+	}
 }
