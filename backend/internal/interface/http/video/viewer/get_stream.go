@@ -71,11 +71,11 @@ func (h *VideoViewingHandler) GetVideoStream(c echo.Context) error {
 		)
 	}
 
-	if match := c.Request().Header.Get("If-None-Match"); match != "" {
-		if match == meta.ETag {
-			res.WriteHeader(http.StatusNotModified)
-			return nil
-		}
+	if h.etagMatches(
+		c.Request().Header.Get("If-None-Match"),
+		meta.ETag,
+	) {
+		return c.NoContent(http.StatusNotModified)
 	}
 
 	if byteRangeQuery != nil {
@@ -139,4 +139,26 @@ func (v *VideoViewingHandler) parseRangeHeader(r string) (*query.VideoRangeQuery
 		Start: start,
 		End:   &end,
 	}, nil
+}
+
+// 弱ETagに対応
+func (v *VideoViewingHandler) etagMatches(ifNoneMatch, currentETag string) bool {
+	if ifNoneMatch == "" {
+		return false
+	}
+
+	parts := strings.Split(ifNoneMatch, ",")
+	for _, part := range parts {
+		tag := strings.TrimSpace(part)
+		if tag == "*" {
+			return true
+		}
+
+		tag = strings.TrimPrefix(tag, "W/")
+		if tag == currentETag {
+			return true
+		}
+	}
+
+	return false
 }
