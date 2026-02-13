@@ -121,6 +121,7 @@ func (v *VideoViewingHandler) parseRangeHeader(r string) (*query.VideoRangeQuery
 		return nil, echo.ErrBadRequest
 	}
 
+	// NOTE: suffix-byte-range (RFC 7233 §2.1) is not supported.
 	start, err := strconv.ParseInt(parts[0], 10, 64)
 	if err != nil {
 		return nil, echo.ErrBadRequest
