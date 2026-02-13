@@ -51,6 +51,9 @@ func (uc *VideoViewingUseCase) GetVideoStream(
 	if strings.Contains(cleanPath, "..") {
 		return nil, GetVideoStreamMeta{}, "", ErrVideoForbidden
 	}
+	if path.IsAbs(cleanPath) {
+		return nil, GetVideoStreamMeta{}, "", ErrVideoForbidden
+	}
 
 	fullKey := path.Join(video.StreamKey(), cleanPath)
 
