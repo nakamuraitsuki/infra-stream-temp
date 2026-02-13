@@ -82,6 +82,16 @@ func (s *videoStorage) GetStream(ctx context.Context, streamKey string, byteRang
 			meta.RangeStart = start
 			meta.RangeEnd = end
 			meta.TotalSize = total
+		} else {
+			// フォーマット不正などで Content-Range のパースに失敗した場合は
+			// Content-Range が無い場合と同様に全体サイズからレンジを推定する
+			meta.TotalSize = aws.ToInt64(out.ContentLength)
+			meta.RangeStart = 0
+			if meta.TotalSize > 0 {
+				meta.RangeEnd = meta.TotalSize - 1
+			} else {
+				meta.RangeEnd = 0
+			}
 		}
 	} else {
 		meta.TotalSize = aws.ToInt64(out.ContentLength)
