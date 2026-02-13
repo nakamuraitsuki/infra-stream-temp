@@ -51,8 +51,15 @@ func (h *VideoViewingHandler) GetVideoStream(c echo.Context) error {
 
 	res.Header().Set(echo.HeaderContentType, mimeType)
 	res.Header().Set("Accept-Ranges", "bytes")
-	res.Header().Set(echo.HeaderCacheControl, "public, max-age=60")
 
+	// Use a stricter cache policy for playlists and non-segment files to avoid
+	// unintentionally caching private or rapidly changing content. Allow short
+	// public caching only for segment files to improve streaming performance.
+	cacheControl := "no-store"
+	if strings.HasSuffix(objectPath, ".ts") {
+		cacheControl = "public, max-age=60"
+	}
+	res.Header().Set(echo.HeaderCacheControl, cacheControl)
 	if meta.ETag != "" {
 		res.Header().Set("ETag", meta.ETag)
 	}
