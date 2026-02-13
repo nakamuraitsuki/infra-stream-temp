@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"example.com/m/internal/domain/video"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -31,6 +32,10 @@ func (s *videoStorage) SaveSource(ctx context.Context, sourceKey string, data io
 func (s *videoStorage) SaveStream(ctx context.Context, streamKey string, data io.Reader) error {
 	// 拡張子から判断した方が良い
 	return s.upload(ctx, streamKey, data, "application/x-mpegURL")
+}
+
+func (s *videoStorage) GenerateTemporaryAccessURL(ctx context.Context, streamKey string, expiresDuration time.Duration) (string, error) {
+	return "", nil
 }
 
 // GetStream 一時ファイル作成　io.ReadSeekerで返す

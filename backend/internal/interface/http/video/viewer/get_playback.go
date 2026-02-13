@@ -34,11 +34,8 @@ func (h *VideoViewingHandler) GetPlaybackInfo(c echo.Context) error {
 		}
 	}
 
-	// クライアントはこのURLにアクセスして動画ストリームを取得する
-	playbackURL := "/api/videos/" + videoID.String() + "/stream"
-
 	resp := GetPlaybackInfoResponse{
-		PlaybackURL: playbackURL,
+		PlaybackURL: info.PlaybackURL,
 		MIMEType:    info.MIMEType,
 	}
 

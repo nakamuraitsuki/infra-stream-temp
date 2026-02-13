@@ -8,8 +8,8 @@ import (
 )
 
 type PlaybackInfo struct {
-	StreamKey string // URL 組み立てはHandler側で行う（リダイレクト）
-	MIMEType  string
+	PlaybackURL string // URL 組み立てはHandler側で行う（リダイレクト）
+	MIMEType    string
 }
 
 func (uc *VideoViewingUseCase) GetPlaybackInfo(
@@ -30,8 +30,19 @@ func (uc *VideoViewingUseCase) GetPlaybackInfo(
 		return nil, ErrVideoForbidden
 	}
 
+	url := "/api/videos/" + videoID.String() + "/stream"
+
+	// url, err := uc.Storage.GenerateTemporaryAccessURL(
+	// 	ctx,
+	// 	video.StreamKey(),
+	// 	15*time.Minute,
+	// )
+	// if err != nil {
+	// 	return nil, err
+	// }
+
 	return &PlaybackInfo{
-		StreamKey: video.StreamKey(),
-		MIMEType:  "application/x-mpegURL",
+		PlaybackURL: url,
+		MIMEType:    "application/x-mpegURL",
 	}, nil
 }
