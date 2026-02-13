@@ -20,22 +20,27 @@ func NewVideoStorage(client *s3.Client, bucketName string) video.Storage {
 	}
 }
 
-func (s *videoStorage) SaveSource(ctx context.Context, key string, data io.Reader) error {
+func (s *videoStorage) SaveSource(ctx context.Context, sourceKey string, data io.Reader) error {
 	// Implementation to save the source video to S3
 	return nil
 }
 
-func (s *videoStorage) SaveStream(ctx context.Context, key string, data io.Reader) error {
+func (s *videoStorage) SaveStream(ctx context.Context, streamKey string, data io.Reader) error {
 	// Implementation to save the transcoded video to S3
 	return nil
 }
 
-func (s *videoStorage) GetStream(ctx context.Context, key string) (io.ReadSeeker, error) {
+func (s *videoStorage) GetStream(ctx context.Context, streamKey string) (io.ReadSeeker, error) {
 	// Implementation to retrieve the transcoded video from S3
 	return nil, nil
 }
 
-func (s *videoStorage) Delete(ctx context.Context, key string) error {
-	// Implementation to delete the video from S3
+func (s *videoStorage) DeleteSource(ctx context.Context, sourceKey string) error {
+	// Implementation to delete the source video from S3
+	return nil
+}
+
+func (s *videoStorage) DeleteStream(ctx context.Context, streamKey string) error {
+	// Implementation to delete the transcoded video from S3
 	return nil
 }
