@@ -22,9 +22,6 @@ func (h *VideoViewingHandler) GetVideoStream(c echo.Context) error {
 	}
 
 	objectPath := c.Param("*")
-	if objectPath == "" {
-		objectPath = "index.m3u8"
-	}
 
 	rangeHeader := c.Request().Header.Get("Range")
 	byteRangeQuery, err := h.parseRangeHeader(rangeHeader)
