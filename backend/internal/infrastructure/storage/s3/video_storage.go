@@ -101,6 +101,17 @@ func (s *videoStorage) GetStream(ctx context.Context, streamKey string, byteRang
 	return out.Body, meta, nil
 }
 
+func (s *videoStorage) GetSource(ctx context.Context, sourceKey string) (io.ReadCloser, error) {
+	out, err := s.client.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(sourceKey),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return out.Body, nil
+}
+
 func (s *videoStorage) DeleteSource(ctx context.Context, sourceKey string) error {
 	_, err := s.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucketName),
