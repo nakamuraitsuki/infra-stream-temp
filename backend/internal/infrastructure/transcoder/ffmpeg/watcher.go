@@ -25,6 +25,10 @@ func (t *ffmpegTranscoder) watchAndQueue(
 
 	for {
 		select {
+		// -- contextキャンセルの検知 --
+		case <-ctx.Done():
+			return ctx.Err()
+
 		// -- ファイルイベントの検知 --
 		case event, ok := <-watcher.Events:
 			if !ok {
@@ -49,10 +53,6 @@ func (t *ffmpegTranscoder) watchAndQueue(
 				return nil // watcherが閉じられた場合
 			}
 			return err
-
-		// -- contextキャンセルの検知 --
-		case <-ctx.Done():
-			return ctx.Err()
 		}
 	}
 }

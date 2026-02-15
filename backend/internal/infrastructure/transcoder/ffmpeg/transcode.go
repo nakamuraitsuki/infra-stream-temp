@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	// TODO: WORKER_POOL_SIZE は環境変数などで設定できるようにすることも検討
-	WORKER_POOL_SIZE          = 4
-	PATHS_CHANNEL_BUFFER_SIZE = WORKER_POOL_SIZE * 2 // ワーカーが待機する分のバッファを確保
+	// TODO: UPLOAD_WORKER_POOL_SIZE は環境変数などで設定できるようにすることも検討
+	UPLOAD_WORKER_POOL_SIZE   = 4
+	PATHS_CHANNEL_BUFFER_SIZE = UPLOAD_WORKER_POOL_SIZE * 2 // ワーカーが待機する分のバッファを確保
 )
 
 func (t *ffmpegTranscoder) Transcode(
@@ -39,7 +39,7 @@ func (t *ffmpegTranscoder) Transcode(
 	eg, gCtx := errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
-		return t.workerPool(gCtx, WORKER_POOL_SIZE, pathCh, streamKey)
+		return t.workerPool(gCtx, UPLOAD_WORKER_POOL_SIZE, pathCh, streamKey)
 	})
 
 	eg.Go(func() error {
@@ -48,7 +48,7 @@ func (t *ffmpegTranscoder) Transcode(
 
 		vEg, vCtx := errgroup.WithContext(gCtx)
 		vCtx, cancel := context.WithCancel(vCtx)
-    defer cancel()
+		defer cancel()
 
 		vEg.Go(func() error {
 			return t.watchAndQueue(vCtx, tmpDir, pathCh)
@@ -57,7 +57,7 @@ func (t *ffmpegTranscoder) Transcode(
 		vEg.Go(func() error {
 			defer cancel() // ffmpegが終わったらwatcherの loop も終了させる
 			segmentPattern := filepath.Join(tmpDir, "segment_%03d.ts")
-	
+
 			cmd := exec.CommandContext(gCtx, "ffmpeg",
 				"-i", sourcePath,
 				"-c:v", "libx264", "-c:a", "aac",
@@ -92,7 +92,7 @@ func (t *ffmpegTranscoder) Transcode(
 		_ = t.storage.DeleteStream(deleteCtx, streamKey)
 		return fmt.Errorf("failed to upload playlist: %w", err)
 	}
-	
+
 	return nil
 }
 

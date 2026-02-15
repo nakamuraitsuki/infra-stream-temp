@@ -19,7 +19,7 @@ func (t *ffmpegTranscoder) workerPool(
 
 	eg, ctx := errgroup.WithContext(ctx)
 
-	for i := 0; i < numWorkers; i++ {
+	for range numWorkers {
 		eg.Go(func() error {
 			for {
 				select {

@@ -15,6 +15,7 @@ SELECT id, event_type, payload, occurred_at
 FROM outbox
 ORDER BY occurred_at ASC
 LIMIT $1	
+FOR UPDATE SKIP LOCKED
 `
 	var models []outboxModel
 	if err := db.SelectContext(ctx, &models, query, limit); err != nil {
