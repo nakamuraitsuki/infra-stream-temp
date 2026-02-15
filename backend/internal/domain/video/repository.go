@@ -23,15 +23,6 @@ type Repository interface {
 	FindByID(ctx context.Context, id uuid.UUID) (*Video, error)
 	Save(ctx context.Context, v *Video) error
 
-	UpdateProcessingResult(
-		ctx context.Context,
-		id uuid.UUID,
-		streamKey string,
-		status value.Status,
-		retryCount int,
-		failureReason *value.FailureReason,
-	) error
-
 	FindByCondition(
 		ctx context.Context,
 		cond ListCondition,

@@ -34,22 +34,26 @@ func NewVideo(
 	title string,
 	description string,
 	tags []value.Tag,
+	retryCount int,
+	failureReason *value.FailureReason,
 	visibility value.Visibility,
 	createdAt time.Time,
 	events []event.Event,
 ) *Video {
 	return &Video{
-		id:          id,
-		ownerID:     ownerID,
-		sourceKey:   sourceKey,
-		streamKey:   streamKey,
-		status:      status,
-		title:       title,
-		description: description,
-		tags:        tags,
-		visibility:  visibility,
-		createdAt:   createdAt,
-		events:      events,
+		id:            id,
+		ownerID:       ownerID,
+		sourceKey:     sourceKey,
+		streamKey:     streamKey,
+		status:        status,
+		title:         title,
+		description:   description,
+		tags:          tags,
+		retryCount:    retryCount,
+		failureReason: failureReason,
+		visibility:    visibility,
+		createdAt:     createdAt,
+		events:        events,
 	}
 }
 
@@ -71,6 +75,14 @@ func (v *Video) Description() string {
 
 func (v *Video) Tags() []value.Tag {
 	return v.tags
+}
+
+func (v *Video) RetryCount() int {
+	return v.retryCount
+}
+
+func (v *Video) FailureReason() *value.FailureReason {
+	return v.failureReason
 }
 
 func (v *Video) PullEvents() []event.Event {

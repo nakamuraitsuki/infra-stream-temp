@@ -56,6 +56,8 @@ func (uc *VideoManagementUseCase) Create(
 		title,
 		description,
 		tags,
+		0,
+		nil,
 		visibility,
 		time.Now(),
 		[]event.Event{},

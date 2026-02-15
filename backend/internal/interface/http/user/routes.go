@@ -12,7 +12,7 @@ func RegisterRoutes(e *echo.Echo, h *Handler) {
 
 	auth := e.Group("/users")
 	auth.Use(middleware.DummyAuthMiddleware) // Dummy認証ミドルウェアを適用
-	
+
 	auth.GET("/me", h.GetMe)
 	auth.PATCH("/me/profile", h.UpdateProfile)
 	auth.PUT("/me/icon", h.UpdateIcon)

@@ -7,5 +7,6 @@ type Queue interface {
 }
 
 type Consumer interface {
-	Start(ctx context.Context, handler Handler) error
+	Register(jobType string, handler Handler)
+	Start(ctx context.Context) error
 }

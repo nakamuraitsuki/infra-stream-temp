@@ -7,9 +7,9 @@ import (
 )
 
 type Metadata struct {
-	ID        uuid.UUID
-	Type      string
-	Attempt   int
-	MaxRetry  int
-	CreatedAt time.Time
+	ID        uuid.UUID `json:"id"`
+	Type      string    `json:"type"`
+	Attempt   int       `json:"attempt"`
+	MaxRetry  int       `json:"max_retry"`
+	CreatedAt time.Time `json:"created_at"`
 }

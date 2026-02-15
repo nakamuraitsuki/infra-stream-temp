@@ -29,7 +29,7 @@ type VideoViewingUseCaseInterface interface {
 	GetPlaybackInfo(ctx context.Context, videoID uuid.UUID) (*PlaybackInfo, error)
 
 	// GetVideoStream returns a readable video stream and its MIME type.
-	GetVideoStream(ctx context.Context, videoID uuid.UUID) (io.ReadSeeker, string, error)
+	GetVideoStream(ctx context.Context, videoID uuid.UUID, objectPath string, byteRangeQuery *query.VideoRangeQuery) (io.ReadCloser, GetVideoStreamMeta, string, error)
 }
 
 type VideoViewingUseCase struct {
