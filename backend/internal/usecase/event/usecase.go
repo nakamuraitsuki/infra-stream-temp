@@ -31,17 +31,17 @@ func NewEventRelayUseCase(
 }
 
 func (uc *EventRelayUseCase) ProcessOutbox(ctx context.Context) error {
-	return uc.UoW.Do(ctx, func(ctx context.Context) error {
 
-		entries, err := uc.OutboxRepo.ListUnpublished(ctx, 10)
-		if err != nil {
-			return err
-		}
+	entries, err := uc.OutboxRepo.ListUnpublished(ctx, 10)
+	if err != nil {
+		return err
+	}
 
-		var firstErr error
+	var firstErr error
 
-		for _, entry := range entries {
+	for _, entry := range entries {
 
+		err = uc.UoW.Do(ctx, func(ctx context.Context) error {
 			meta := job.Metadata{
 				ID:        entry.ID,
 				Type:      entry.EventType,
@@ -51,18 +51,24 @@ func (uc *EventRelayUseCase) ProcessOutbox(ctx context.Context) error {
 			}
 
 			if err := uc.JobQueue.Enqueue(ctx, meta, entry.Payload); err != nil {
-				if firstErr == nil {
-					firstErr = err
-				}
-				continue
+				return err
 			}
 
 			if err := uc.OutboxRepo.MarkAsPublished(ctx, entry.ID); err != nil {
-				// これは致命的
 				return err
 			}
-		}
 
-		return firstErr
-	})
+			return nil
+		})
+
+		if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
+			// NOTE: 1件の失敗で全体を止めないため、エラーは記録して続行する
+			continue
+		}
+	}
+
+	return firstErr
 }
