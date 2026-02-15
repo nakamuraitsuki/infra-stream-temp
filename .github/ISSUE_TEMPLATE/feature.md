@@ -1,3 +1,11 @@
+---
+name: Feature
+about: 機能追加用テンプレート
+title: "[Feature] "
+labels: ["feature"]
+assignees: ""
+---
+
 # 機能: XXX
 
 ## 目的
