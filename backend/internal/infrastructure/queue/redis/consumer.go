@@ -135,6 +135,10 @@ func (c *consumer) dispatch(ctx context.Context, jobMsg jobMessage) error {
 
 	if !ok {
 		log.Printf("No handler registered for job type: %s", jobMsg.Meta.Type)
+		// ハンドラ未登録の場合でもジョブを消失させないため、元のキューに再投入する
+		if err := c.queue.Enqueue(ctx, jobMsg.Meta, jobMsg.Payload); err != nil {
+			log.Printf("Failed to re-enqueue job without registered handler [type: %s, id: %s]: %v", jobMsg.Meta.Type, jobMsg.Meta.ID, err)
+		}
 		// NOTE: リトライ処理を図るので、Consumer群に伝播させない
 		return nil
 	}
