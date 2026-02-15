@@ -19,19 +19,21 @@ const (
 )
 
 type consumer struct {
-	client   *Client
-	queue    job.Queue
-	key      string // Queueの識別子
-	handlers map[string]job.Handler
-	mu       sync.RWMutex
+	client        *Client
+	queue         job.Queue
+	key           string // pending Queue の識別子
+	processingKey string // processing Queue の識別子
+	handlers      map[string]job.Handler
+	mu            sync.RWMutex
 }
 
-func NewConsumer(client *Client, queue job.Queue, key string) job.Consumer {
+func NewConsumer(client *Client, queue job.Queue, key string, processingKey string) job.Consumer {
 	return &consumer{
-		client:   client,
-		queue:    queue,
-		key:      key,
-		handlers: make(map[string]job.Handler),
+		client:        client,
+		queue:         queue,
+		key:           key,
+		processingKey: processingKey,
+		handlers:      make(map[string]job.Handler),
 	}
 }
 
@@ -42,8 +44,8 @@ func (c *consumer) Register(jobType string, h job.Handler) {
 }
 
 func (c *consumer) Start(ctx context.Context) error {
-	log.Printf("Starting Redis Consumer [key: %s]", c.key)
-	jobCh := make(chan jobMessage, JOB_CHANNEL_BUFFER_SIZE)
+	log.Printf("Starting Redis Consumer [key: %s, processingKey: %s]", c.key, c.processingKey)
+	jobCh := make(chan []byte, JOB_CHANNEL_BUFFER_SIZE)
 	eg, gCtx := errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
@@ -60,14 +62,14 @@ func (c *consumer) Start(ctx context.Context) error {
 
 func (c *consumer) watcher(
 	ctx context.Context,
-	jobCh chan<- jobMessage,
+	jobCh chan<- []byte,
 ) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		default:
-			res, err := c.client.Universal.BRPop(ctx, 5*time.Second, c.key).Result()
+			res, err := c.client.Universal.BRPopLPush(ctx, c.key, c.processingKey, 5*time.Second).Result()
 			if err != nil {
 				if errors.Is(err, redis.Nil) {
 					continue // timeout
@@ -77,19 +79,8 @@ func (c *consumer) watcher(
 				continue
 			}
 
-			// NOTE: res[0]がkey, res[1]が実データなはずなので
-			if len(res) < 2 {
-				continue
-			}
-
-			var msg jobMessage
-			if err := json.Unmarshal([]byte(res[1]), &msg); err != nil {
-				log.Printf("Failed to unmarshal job message: %v", err)
-				continue
-			}
-
 			select {
-			case jobCh <- msg:
+			case jobCh <- []byte(res):
 			case <-ctx.Done():
 				return nil
 			}
@@ -100,7 +91,7 @@ func (c *consumer) watcher(
 func (c *consumer) workerPool(
 	ctx context.Context,
 	numWorkers int,
-	jobCh <-chan jobMessage,
+	jobCh <-chan []byte,
 ) error {
 	eg, ctx := errgroup.WithContext(ctx)
 
@@ -113,11 +104,11 @@ func (c *consumer) workerPool(
 					return nil
 
 				// -- ジョブの処理 --
-				case msgByte, ok := <-jobCh:
+				case job, ok := <-jobCh:
 					if !ok {
 						return nil // channelが閉じられた場合
 					}
-					if err := c.dispatch(ctx, msgByte); err != nil {
+					if err := c.dispatch(ctx, job); err != nil {
 						return err
 					}
 				}
@@ -128,7 +119,20 @@ func (c *consumer) workerPool(
 	return eg.Wait()
 }
 
-func (c *consumer) dispatch(ctx context.Context, jobMsg jobMessage) error {
+func (c *consumer) dispatch(ctx context.Context, jobBytes []byte) error {
+		var jobMsg jobMessage
+	if err := json.Unmarshal(jobBytes, &jobMsg); err != nil {
+		log.Printf("Failed to unmarshal job message: %v", err)
+		return err
+	}
+
+	defer func() {
+		// ジョブの処理が終わったらprocessing Queueから削除する
+		if err := c.client.Universal.LRem(ctx, c.processingKey, 1, jobBytes).Err(); err != nil {
+			log.Printf("Failed to remove job from processing queue [type: %s, id: %s]: %v", jobMsg.Meta.Type, jobMsg.Meta.ID, err)
+		}
+	}()
+
 	c.mu.RLock()
 	handler, ok := c.handlers[jobMsg.Meta.Type]
 	c.mu.RUnlock()
