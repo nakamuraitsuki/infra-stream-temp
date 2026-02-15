@@ -12,14 +12,14 @@ import (
 
 func (t *ffmpegTranscoder) workerPool(
 	ctx context.Context,
-	numWorks int,
+	numWorkers int,
 	pathCh <-chan string,
 	streamKey string,
 ) error {
 
 	eg, ctx := errgroup.WithContext(ctx)
 
-	for i := 0; i < numWorks; i++ {
+	for i := 0; i < numWorkers; i++ {
 		eg.Go(func() error {
 			for {
 				select {
