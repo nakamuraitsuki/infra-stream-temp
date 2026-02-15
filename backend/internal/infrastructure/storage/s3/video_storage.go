@@ -35,8 +35,7 @@ func (s *videoStorage) SaveStream(ctx context.Context, streamKey string, data io
 }
 
 func (s *videoStorage) GenerateTemporaryAccessURL(ctx context.Context, streamKey string, expiresDuration time.Duration) (string, error) {
-	panic("not implemented")
-	return "", nil
+	return "", fmt.Errorf("GenerateTemporaryAccessURL: not implemented")
 }
 
 func (s *videoStorage) GetStream(ctx context.Context, streamKey string, byteRange *video.ByteRange) (io.ReadCloser, *video.ObjectMeta, error) {
@@ -100,6 +99,17 @@ func (s *videoStorage) GetStream(ctx context.Context, streamKey string, byteRang
 	}
 
 	return out.Body, meta, nil
+}
+
+func (s *videoStorage) GetSource(ctx context.Context, sourceKey string) (io.ReadCloser, error) {
+	out, err := s.client.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(sourceKey),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return out.Body, nil
 }
 
 func (s *videoStorage) DeleteSource(ctx context.Context, sourceKey string) error {
