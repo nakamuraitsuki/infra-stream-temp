@@ -8,7 +8,7 @@ type ffmpegTranscoder struct {
 	storage video.Storage
 }
 
-func NewFfmpegTranscoder(storage video.Storage) video.Transcoder {
+func NewFFmpegTranscoder(storage video.Storage) video.Transcoder {
 	return &ffmpegTranscoder{
 		storage: storage,
 	}
