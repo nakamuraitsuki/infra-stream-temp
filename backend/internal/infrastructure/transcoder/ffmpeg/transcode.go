@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	// TODO: WORKER_POOL_SIZE は環境変数などで設定できるようにすることも検討
+	// TODO: UPLOAD_WORKER_POOL_SIZE は環境変数などで設定できるようにすることも検討
 	UPLOAD_WORKER_POOL_SIZE   = 4
 	PATHS_CHANNEL_BUFFER_SIZE = UPLOAD_WORKER_POOL_SIZE * 2 // ワーカーが待機する分のバッファを確保
 )
