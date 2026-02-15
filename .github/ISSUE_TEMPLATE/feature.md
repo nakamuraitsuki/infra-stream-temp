@@ -6,8 +6,6 @@ labels: ["feature"]
 assignees: ""
 ---
 
-# 機能: XXX
-
 ## 目的
 （この機能を追加する理由を記載）
 
