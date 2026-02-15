@@ -24,9 +24,6 @@ func (t *ffmpegTranscoder) watchAndQueue(
 	}
 
 	for {
-		// NOTE: 個人的にselect構文見づらいので
-		//       caseごとにコメントを入れるようにしてほしいです。
-
 		select {
 		// -- ファイルイベントの検知 --
 		case event, ok := <-watcher.Events:
