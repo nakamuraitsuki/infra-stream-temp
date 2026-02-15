@@ -1,3 +1,11 @@
+---
+name: Bug
+about: バグ修正用テンプレート
+title: "[Bug] "
+labels: ["bugfix"]
+assignees: ""
+---
+
 ## 問題の概要
 何が起きているかを簡潔に。
 
