@@ -23,6 +23,7 @@ type consumer struct {
 	queue         job.Queue
 	key           string // pending Queue の識別子
 	processingKey string // processing Queue の識別子
+	dlqKey        string // DLQ の識別子
 	handlers      map[string]job.Handler
 	mu            sync.RWMutex
 }
@@ -32,7 +33,8 @@ func NewConsumer(client *Client, queue job.Queue, key string, processingKey stri
 		client:        client,
 		queue:         queue,
 		key:           key,
-		processingKey: processingKey,
+		processingKey: key + ":processing",
+		dlqKey:        key + ":dlq",
 		handlers:      make(map[string]job.Handler),
 	}
 }
@@ -44,7 +46,16 @@ func (c *consumer) Register(jobType string, h job.Handler) {
 }
 
 func (c *consumer) Start(ctx context.Context) error {
-	log.Printf("Starting Redis Consumer [key: %s, processingKey: %s]", c.key, c.processingKey)
+	// NOTE: サービス再起動時などにprocessing Queueに残っているジョブをpending Queueに戻す
+	for {
+		err := c.client.Universal.RPopLPush(ctx, c.processingKey, c.key).Err()
+		if err != nil {
+			break // redis.Nil なら空なので終了
+		}
+	}
+
+	log.Printf("Starting Redis Consumer [key: %s, processingKey: %s, dlqKey: %s]", c.key, c.processingKey, c.dlqKey)
+
 	jobCh := make(chan []byte, JOB_CHANNEL_BUFFER_SIZE)
 	eg, gCtx := errgroup.WithContext(ctx)
 
@@ -152,10 +163,25 @@ func (c *consumer) dispatch(ctx context.Context, jobBytes []byte) error {
 		// NOTE: retry
 		if jobMsg.Meta.Attempt < jobMsg.Meta.MaxRetry {
 			jobMsg.Meta.Attempt++
+
+			// NOTE: 指数バックオフの計算: 2^attempt * 1秒 (例: 2s, 4s, 8s...)
+			backoff := time.Duration(1<<jobMsg.Meta.Attempt) * time.Second
+			log.Printf("Retrying job %s in %v (Attempt: %d)", jobMsg.Meta.ID, backoff, jobMsg.Meta.Attempt)
+			
+			// NOTE: 本来は「遅延キュー」に入れるのがベストだが......
+			time.Sleep(backoff)
+
 			if err := c.queue.Enqueue(ctx, jobMsg.Meta, jobMsg.Payload); err != nil {
 				log.Printf("Failed to re-enqueue job [type: %s, id: %s]: %v", jobMsg.Meta.Type, jobMsg.Meta.ID, err)
+			}
+		} else {
+			// 最大リトライ回数を超えた場合、DLQ にジョブを移動する
+			if err := c.client.Universal.LPush(ctx, c.dlqKey, jobBytes).Err(); err != nil {
+				log.Printf("Failed to move job to DLQ [type: %s, id: %s]: %v", jobMsg.Meta.Type, jobMsg.Meta.ID, err)
 			}
 		}
 	}
 	return nil
 }
+
+
