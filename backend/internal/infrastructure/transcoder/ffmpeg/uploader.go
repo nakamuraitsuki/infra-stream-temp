@@ -19,8 +19,6 @@ func (t *ffmpegTranscoder) workerPool(
 
 	eg, ctx := errgroup.WithContext(ctx)
 
-	// NOTE: select構文は個人的に見づらいので
-	//       caseごとにコメントを入れるようにしてほしいです。
 	for i := 0; i < numWorks; i++ {
 		eg.Go(func() error {
 			for {
