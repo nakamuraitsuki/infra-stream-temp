@@ -35,7 +35,7 @@ func (s *videoStorage) SaveStream(ctx context.Context, streamKey string, data io
 }
 
 func (s *videoStorage) GenerateTemporaryAccessURL(ctx context.Context, streamKey string, expiresDuration time.Duration) (string, error) {
-	return "", nil
+	return "", fmt.Errorf("GenerateTemporaryAccessURL: not implemented")
 }
 
 func (s *videoStorage) GetStream(ctx context.Context, streamKey string, byteRange *video.ByteRange) (io.ReadCloser, *video.ObjectMeta, error) {
