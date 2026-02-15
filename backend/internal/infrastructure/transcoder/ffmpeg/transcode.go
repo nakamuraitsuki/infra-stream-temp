@@ -79,13 +79,17 @@ func (t *ffmpegTranscoder) Transcode(
 	})
 
 	if err := eg.Wait(); err != nil {
-		_ = t.storage.DeleteStream(ctx, streamKey)
+		// context が終了されている可能性を考慮
+		deleteCtx := context.WithoutCancel(ctx)
+		_ = t.storage.DeleteStream(deleteCtx, streamKey)
 		return err
 	}
 
 	err = t.uploadFile(ctx, playlistPath, streamKey)
 	if err != nil {
-		t.storage.DeleteStream(ctx, streamKey)
+		// context が終了されている可能性を考慮
+		deleteCtx := context.WithoutCancel(ctx)
+		_ = t.storage.DeleteStream(deleteCtx, streamKey)
 		return fmt.Errorf("failed to upload playlist: %w", err)
 	}
 	
