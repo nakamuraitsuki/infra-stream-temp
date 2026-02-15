@@ -38,7 +38,7 @@ func (t *ffmpegTranscoder) watchAndQueue(
 					select {
 					case pathCh <- event.Name:
 					case <-ctx.Done():
-						return ctx.Err() // contextがキャンセルされたら終了
+						return nil // contextがキャンセルされたら終了
 					}
 				}
 			}

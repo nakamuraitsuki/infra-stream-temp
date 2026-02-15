@@ -25,7 +25,7 @@ func (t *ffmpegTranscoder) workerPool(
 				select {
 				// -- contextキャンセルの検知 --
 				case <-ctx.Done():
-					return ctx.Err() // contextがキャンセルされたら終了
+					return nil // contextがキャンセルされたら終了
 
 				// -- アップロード --
 				case path, ok := <-pathCh:
