@@ -20,9 +20,9 @@ type Client struct {
 
 func NewClient(cfg Config) (*Client, error) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr: cfg.Addr,
+		Addr:     cfg.Addr,
 		Password: cfg.Password,
-		DB: cfg.DB,
+		DB:       cfg.DB,
 	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
