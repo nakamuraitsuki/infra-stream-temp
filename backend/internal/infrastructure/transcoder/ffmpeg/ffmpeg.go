@@ -1,21 +1,15 @@
 package ffmpeg
 
 import (
-	"context"
-
 	"example.com/m/internal/domain/video"
 )
 
-type FfmpegTranscoder struct {
+type ffmpegTranscoder struct {
 	storage video.Storage
 }
 
 func NewFfmpegTranscoder(storage video.Storage) video.Transcoder {
-	return &FfmpegTranscoder{
+	return &ffmpegTranscoder{
 		storage: storage,
 	}
-}
-
-func (t *FfmpegTranscoder) Transcode(ctx context.Context, sourceKey string, streamKey string) error {
-	return nil
 }
