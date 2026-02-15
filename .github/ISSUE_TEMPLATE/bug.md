@@ -2,7 +2,7 @@
 name: Bug
 about: バグ修正用テンプレート
 title: "[Bug] "
-labels: ["bugfix"]
+labels: ["Bugfix"]
 assignees: ""
 ---
 
