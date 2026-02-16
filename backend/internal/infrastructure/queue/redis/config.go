@@ -16,3 +16,7 @@ func NewRedisConfig() Config {
 		DB:       env.GetInt("REDIS_DB", 0),           // デフォルトのDB番号は0
 	}
 }
+
+type QueueConfig struct {
+	Key string
+}
