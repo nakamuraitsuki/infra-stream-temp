@@ -87,7 +87,7 @@ func main() {
 		return jobConsumer.Start(ctx)
 	})
 
-	// 3. どちらかがエラーを出すか、中断信号が来たら終了
+	// いずれかのWorkerがエラーを出すか、中断信号が来たら終了
 	if err := eg.Wait(); err != nil {
 		log.Printf("Worker stopped with error: %v", err)
 		return
