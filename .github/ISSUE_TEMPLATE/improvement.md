@@ -1,5 +1,5 @@
 ---
-name: "✨ 改善・機能追加 (Improvement / Feature Request)"
+name: "改善(Improvement)"
 about: 既存機能のブラッシュアップや新しいアイデアの提案
 title: "[Improvement]: "
 labels: Improvement
