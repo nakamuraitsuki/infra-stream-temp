@@ -18,10 +18,10 @@ type videoStorage struct {
 	bucketName string
 }
 
-func NewVideoStorage(client *s3.Client, bucketName string) video.Storage {
+func NewVideoStorage(client *s3.Client, cfg Config) video.Storage {
 	return &videoStorage{
 		client:     client,
-		bucketName: bucketName,
+		bucketName: cfg.BucketName,
 	}
 }
 

@@ -8,12 +8,6 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type Config struct {
-	Addr     string
-	Password string
-	DB       int
-}
-
 type Client struct {
 	Universal redis.UniversalClient
 }

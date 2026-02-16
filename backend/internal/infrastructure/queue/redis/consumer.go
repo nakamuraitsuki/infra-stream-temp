@@ -24,7 +24,7 @@ type consumer struct {
 	mu            sync.RWMutex
 }
 
-func NewConsumer(client *Client, queue job.Queue, key string, processingKey string) job.Consumer {
+func NewConsumer(client *Client, queue job.Queue, key string) job.Consumer {
 	return &consumer{
 		client:        client,
 		queue:         queue,
