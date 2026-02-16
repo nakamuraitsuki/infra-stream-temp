@@ -21,12 +21,13 @@ import (
 	user2 "example.com/m/internal/usecase/user"
 	"example.com/m/internal/usecase/video/manage"
 	"example.com/m/internal/usecase/video/view"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
 
 // Injectors from wire.go:
 
-func InitializeHTTPServer() (*echo.Echo, error) {
+func InitializeHTTPServer() (*HTTPServerApp, error) {
 	config := postgres.NewPostgresConfig()
 	db, err := postgres.NewClient(config)
 	if err != nil {
@@ -51,11 +52,20 @@ func InitializeHTTPServer() (*echo.Echo, error) {
 	videoManagementHandler := manager.NewVideoManagementHandler(videoManagementUseCaseInterface)
 	videoViewingUseCaseInterface := view.NewVideoViewingUseCase(videoRepository, storage)
 	videoViewingHandler := viewer.NewVideoViewingHandler(videoViewingUseCaseInterface)
-	echoEcho := http.NewRouter(handler, videoManagementHandler, videoViewingHandler)
-	return echoEcho, nil
+	echo := http.NewRouter(handler, videoManagementHandler, videoViewingHandler)
+	httpServerApp := &HTTPServerApp{
+		Echo: echo,
+		DB:   db,
+	}
+	return httpServerApp, nil
 }
 
 // wire.go:
+
+type HTTPServerApp struct {
+	Echo *echo.Echo
+	DB   *sqlx.DB
+}
 
 func provideContext() context.Context {
 	return context.Background()

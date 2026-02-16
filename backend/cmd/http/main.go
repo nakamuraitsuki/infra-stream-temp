@@ -3,10 +3,11 @@ package main
 import "log"
 
 func main() {
-	e, err := InitializeHTTPServer()
+	app, err := InitializeHTTPServer()
 	if err != nil {
 		log.Fatalf("サーバーの初期化に失敗しました: %v", err)
 	}
+	defer app.DB.Close()
 	
-	e.Logger.Fatal(e.Start(":8080"))
+	app.Echo.Logger.Fatal(app.Echo.Start(":8080"))
 }

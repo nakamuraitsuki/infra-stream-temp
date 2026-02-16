@@ -20,14 +20,20 @@ import (
 	"example.com/m/internal/usecase/video/manage"
 	"example.com/m/internal/usecase/video/view"
 	"github.com/google/wire"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
+
+type HTTPServerApp struct {
+	Echo *echo.Echo
+	DB   *sqlx.DB
+}
 
 func provideContext() context.Context {
 	return context.Background()
 }
 
-func InitializeHTTPServer() (*echo.Echo, error) {
+func InitializeHTTPServer() (*HTTPServerApp, error) {
 	wire.Build(
 		provideContext,
 		// Configs
@@ -61,6 +67,8 @@ func InitializeHTTPServer() (*echo.Echo, error) {
 
 		// Router
 		http.NewRouter,
+
+		wire.Struct(new(HTTPServerApp), "*"),
 	)
 
 	return nil, nil
