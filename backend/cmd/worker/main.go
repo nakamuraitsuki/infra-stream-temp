@@ -89,7 +89,8 @@ func main() {
 
 	// 3. どちらかがエラーを出すか、中断信号が来たら終了
 	if err := eg.Wait(); err != nil {
-		log.Fatalf("Worker stopped with error: %v", err)
+		log.Printf("Worker stopped with error: %v", err)
+		return
 	}
 	log.Println("Successfully shutdown all workers.")
 }
