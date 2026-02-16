@@ -9,6 +9,6 @@ type outboxRepository struct {
 	db *sqlx.DB
 }
 
-func NewOutboxRepository(db *sqlx.DB) shared.OutboxRepository {
+func NewRepository(db *sqlx.DB) shared.OutboxRepository {
 	return &outboxRepository{db: db}
 }

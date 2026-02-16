@@ -15,10 +15,10 @@ type iconStorage struct {
 	bucketName string
 }
 
-func NewIconStorage(client *s3.Client, bucketName string) user.IconStorage {
+func NewIconStorage(client *s3.Client, cfg Config) user.IconStorage {
 	return &iconStorage{
 		client:     client,
-		bucketName: bucketName,
+		bucketName: cfg.BucketName,
 	}
 }
 
