@@ -16,14 +16,7 @@ type DB interface {
 	SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 }
 
-type Config struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DBName   string
-	SSLMode  string
-}
+
 
 func NewClient(cfg Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(

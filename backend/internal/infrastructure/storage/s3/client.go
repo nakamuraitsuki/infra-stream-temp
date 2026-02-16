@@ -8,16 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-type Config struct {
-	Endpoint     string
-	Region       string
-	BucketName   string
-	AccessKey    string
-	SecretKey    string
-	UsePathStyle bool
-	UseSSL       bool
-}
-
 func NewClient(ctx context.Context, cfg Config) (*s3.Client, error) {
 	awsCfg, err := config.LoadDefaultConfig(ctx,
 		config.WithRegion(cfg.Region),
