@@ -67,7 +67,7 @@ func main() {
 	relayWorker := outbox.NewRelayWorker(eventRelayUseCase, interval)
 
 	// ConsumerにWorkerを登録
-	jobConsumer.Register(event.TRANSCODING_REQUEST_TYPE, &process.TranscodeHandler{UseCase: processUseCase})
+	jobConsumer.Register(event.TranscodingRequestType, &process.TranscodeHandler{UseCase: processUseCase})
 
 	// シグナルをキャッチしてGraceful Shutdownを行うためのコンテキストを作成
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

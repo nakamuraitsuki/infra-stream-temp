@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const TRANSCODING_REQUEST_TYPE = "video.transcoding_requested"
+const TranscodingRequestType = "video.transcoding_requested"
 
 // Domain Model 内で使用するイベントの定義
 type TranscodingRequested struct {
@@ -26,7 +26,7 @@ func NewTranscodingRequested(videoID uuid.UUID) Event {
 
 // インターフェースを満たすためのメソッド
 func (e *TranscodingRequested) ID() uuid.UUID         { return e.EventID }
-func (e *TranscodingRequested) EventType() string     { return TRANSCODING_REQUEST_TYPE }
+func (e *TranscodingRequested) EventType() string     { return TranscodingRequestType }
 func (e *TranscodingRequested) OccurredAt() time.Time { return e.Timestamp }
 func (e *TranscodingRequested) Payload() any {
 	return e
