@@ -11,6 +11,7 @@ type LogoutResponse struct {
 	Message string `json:"message"`
 }
 
+// POST /users/logout
 func (h *Handler) Logout(c echo.Context) error {
 	// Cookie を削除してログアウト
 	c.SetCookie(&http.Cookie{

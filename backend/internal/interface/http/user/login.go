@@ -16,6 +16,7 @@ type DummyLoginResponse struct {
 	Role    string    `json:"role,omitempty"`
 }
 
+// POST /users/login
 func (h *Handler) DummyLogin(c echo.Context) error {
 	// 仮ユーザーとして UUID ゼロ値を Cookie に書き込む
 	c.SetCookie(&http.Cookie{
