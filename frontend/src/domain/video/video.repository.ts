@@ -8,16 +8,18 @@ export interface GetPlaybackInfoResponse {
 
 export interface IVideoRepository {
   findByID(id: VideoId): Promise<Result<Video, VideoError>>;
+
   findPublicVideos(): Promise<Video[]>;
   findByTag(tag: Tag): Promise<Video[]>;
-  getPlaybackInfo(id: VideoId): Promise<GetPlaybackInfoResponse>;
+  findMyVideos(): Promise<Video[]>;
+
+  getPlaybackInfo(id: VideoId): Promise<Result<GetPlaybackInfoResponse, VideoError>>;
   create(
     title: string,
     description: string,
     tags: Tag[],
-  ): Promise<Video>;
-  uploadSource(id: VideoId, file: File): Promise<void>;
-  findMyVideos(): Promise<Video[]>;
+  ): Promise<Result<Video, VideoError>>;
+  uploadSource(id: VideoId, file: File): Promise<Result<void, VideoError>>;
 }
 
 export type VideoError = 

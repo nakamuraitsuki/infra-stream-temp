@@ -5,7 +5,7 @@ import type { IUserRepository, UpdateIconError } from "../../domain/user/user.re
 
 export class UserRepositoryImpl implements IUserRepository {
   async updateProfile(name: string | null, bio: string | null): Promise<void> {
-    await apiClient.patch("/users/profile", {
+    await apiClient.patch("/api/users/profile", {
       name,
       bio,
     });
@@ -18,7 +18,7 @@ if (!icon) return failure<UpdateIconError>("INVALID_FORMAT");
     formData.append("file", icon);
 
     try {
-      await apiClient.post("/users/icon", formData);
+      await apiClient.post("/api/users/icon", formData);
       return success(undefined);
     } catch (error) {
       if (axios.isAxiosError(error)) {

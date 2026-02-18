@@ -9,7 +9,7 @@ export class AuthRepositoryImpl implements IAuthRepository {
   async login(_name: string, _password: string): Promise<Result<User, AuthError>> {
     // NOTE: 現在はBackendにDummyLoginがあるので引数は使わない
     try {
-      const { data } = await apiClient.post<User>("/users/login");
+      const { data } = await apiClient.post<User>("/api/users/login");
       return success(data);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -20,12 +20,12 @@ export class AuthRepositoryImpl implements IAuthRepository {
   }
 
   async logout(): Promise<void> {
-    await apiClient.post("/users/logout");
+    await apiClient.post("/api/users/logout");
   }
 
   async fetchCurrentSession(): Promise<AuthSession> {
     try {
-      const { data } = await apiClient.get<User>("/users/me");
+      const { data } = await apiClient.get<User>("/api/users/me");
       return {
         status: "authenticated",
         user: data,
