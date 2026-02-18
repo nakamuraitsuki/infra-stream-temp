@@ -19,7 +19,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
 
   async findByID(id: VideoId): Promise<Result<Video, VideoError>> {
     try {
-      const { data } = await apiClient.get(`api/videos/${id}`);
+      const { data } = await apiClient.get(`/api/videos/${id}`);
       return success(data);
     } catch (error) {
       return failure(this.handleError(error));
@@ -27,7 +27,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
   }
 
   async findPublicVideos(): Promise<Video[]> {
-    const { data } = await apiClient.get<Video[]>("api/videos");
+    const { data } = await apiClient.get<Video[]>("/api/videos");
     return data;
   }
 
@@ -39,7 +39,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
   }
 
   async findMyVideos(): Promise<Video[]> {
-    const { data } = await apiClient.get<Video[]>("/videos/mine");
+    const { data } = await apiClient.get<Video[]>("/api/videos/mine");
     return data;
   }
 
