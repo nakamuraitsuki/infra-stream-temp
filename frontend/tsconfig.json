@@ -6,6 +6,6 @@
   ],
   "compilerOptions": {
     // cf. https://zod.dev/?id=requirements
-    "strict": true,
+    "strict": true
   }
 }
