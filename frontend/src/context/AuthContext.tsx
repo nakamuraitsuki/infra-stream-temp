@@ -24,8 +24,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const currentSession = await authRepo.fetchCurrentSession();
-      setSession(currentSession);
+      try {
+        const currentSession = await authRepo.fetchCurrentSession();
+        setSession(currentSession);
+      } catch (_error) {
+        setSession({ status: 'unauthenticated', user: null });
+      }
     }
     initAuth();
   }, [authRepo]);
