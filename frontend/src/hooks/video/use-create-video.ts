@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext"
 import { useServices } from "../../context/ServiceContext";
-import type { VideoId, VideoTag } from "../../domain/video/video.model";
+import type { VideoTag } from "../../domain/video/video.model";
+import { createVideoMetaUseCase } from "../../application/video/CreateVideoMetaUseCase";
+import { uploadVideoSource } from "../../application/video/UploadVideoSource";
 
 export type CreateVideoResult =
-  | { type: "complete", videoId: VideoId }
-  | { type: "upload_failed", videoId: VideoId, error: string }
-  | { type: "create_failed", error: string }
-  | { type: "unauthenticated", error: string };
+  | { type: "success"; videoId: string }
+  | { type: "create_failed"; error: string }
+  | { type: "upload_failed"; error: string }
+  | { type: "unauthenticated"; error: string };
 
 export const useCreateVideo = () => {
   const { session } = useAuth();
@@ -15,7 +17,16 @@ export const useCreateVideo = () => {
 
   const [createLoading, setCreateLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
-  const loading = createLoading || uploadLoading;
+
+  const createMeta = useMemo(
+    () => createVideoMetaUseCase({ session, videoRepo }),
+    [videoRepo, session]
+  );
+
+  const uploadSource = useMemo(
+    () => uploadVideoSource({ videoRepo }),
+    [videoRepo]
+  );
 
   const createVideo = async (
     title: string,
@@ -23,59 +34,31 @@ export const useCreateVideo = () => {
     tags: VideoTag[],
     file: File
   ): Promise<CreateVideoResult> => {
-    if (!session) {
-      return { type: "unauthenticated", error: "User is not authenticated" };
+    setCreateLoading(true);
+    const createRes = await createMeta.execute({ title, description, tags });
+    setCreateLoading(false);
+
+    if (createRes.type === "unauthenticated" || createRes.type === "create_failed") {
+      return createRes;
     }
 
-    setCreateLoading(true);
-    let videoId: VideoId;
-    try {
-      const createRes = await videoRepo.create(title, description, tags);
-      if (!createRes.success) {
-        throw new Error(createRes.error);
-      }
-      videoId = createRes.data.id;
-    } catch (e: any) {
-      return { type: "create_failed", error: e.message };
-    } finally {
-      setCreateLoading(false);
-    }
+    const videoId = createRes.videoId;
 
     setUploadLoading(true);
-    try {
-      const uploadRes = await videoRepo.uploadSource(videoId, file);
-      if (!uploadRes.success) {
-        throw new Error(uploadRes.error);
-      }
-      return { type: "complete", videoId };
-    } catch (e: any) {
-      return { type: "upload_failed", videoId, error: e.message };
-    } finally {
-      setUploadLoading(false);
+    const uploadRes = await uploadSource.execute({ videoId, file });
+    setUploadLoading(false);
+
+    if (uploadRes.type === "upload_failed") {
+      return uploadRes;
     }
+
+    return { type: "success", videoId };
   };
 
-  const retryUpload = async (videoId: VideoId, file: File): Promise<CreateVideoResult> => {
-    try {
-      setUploadLoading(true);
-
-      const uploadRes = await videoRepo.uploadSource(videoId, file);
-      if (!uploadRes.success) {
-        throw new Error(uploadRes.error);
-      }
-      return { type: "complete", videoId };
-    } catch (e: any) {
-      return { type: "upload_failed", videoId, error: e.message };
-    } finally {
-      setUploadLoading(false);
-    }
-  }
-
-  return { 
-    createVideo, 
-    retryUpload, 
-    loading, 
-    createLoading, 
-    uploadLoading 
+  return {
+    createVideo,
+    createLoading,
+    uploadLoading,
+    loading: createLoading || uploadLoading
   };
-}
+};
