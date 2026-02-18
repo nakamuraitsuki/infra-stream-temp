@@ -7,7 +7,8 @@ export const apiClient = axios.create({
   withCredentials: true,
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json', // default content type for all requests
+    // NOTE: デフォルトでJSONを設定。別のフォーマットを使う際には上書きすること。
+    'Content-Type': 'application/json', 
   }
 })
 
