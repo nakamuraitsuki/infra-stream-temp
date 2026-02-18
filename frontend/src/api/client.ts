@@ -1,4 +1,5 @@
 import axios from 'axios';
+import camelcaseKeys from 'camelcase-keys';
 import snakecaseKeys from 'snakecase-keys';
 
 // cf. https://axios-http.com/ja/docs/intro
@@ -16,7 +17,7 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   // FormDataは触らない
   if (config.data && !(config.data instanceof FormData)) {
-    // cf. https://github.com/sindresorhus/camelcase-keys
+    // cf. https://github.com/bendrucker/snakecase-keys
     config.data = snakecaseKeys(config.data, { deep: true });
   }
   return config;
@@ -27,8 +28,8 @@ apiClient.interceptors.response.use(
   (response) => {
     // JSON以外触らない
     if (response.data && response.headers['content-type']?.includes('application/json')) {
-      // cf. https://github.com/bendrucker/snakecase-keys
-      response.data = snakecaseKeys(response.data, { deep: true });
+      // cf. https://github.com/sindresorhus/camelcase-keys
+      response.data = camelcaseKeys(response.data, { deep: true });
     }
     return response;
   },
