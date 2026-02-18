@@ -10,7 +10,7 @@ export type VideoStatus =
   | 'ready'
   | 'failed';
 
-export type Tag =
+export type VideoTag =
   | 'competition_programming'
   | 'web_development'
   | 'machine_learning'
@@ -18,16 +18,17 @@ export type Tag =
   | 'infrastructure'
   | 'other';
 
-export type Visibility = 'public' | 'private';
+export type VideoVisibility = 'public' | 'private';
 
 export interface Video {
   readonly id: VideoId;
-  readonly ownerId?: UserId;
-  readonly status: VideoStatus;
   readonly title: string;
   readonly description: string;
-  readonly tags: Tag[];
-  readonly failureReason?: string;
-  readonly visibility?: Visibility;
+  readonly tags: VideoTag[];
   readonly createdAt: Date;
+  // 状況によってバックエンドから提供されない詳細情報
+  readonly ownerId?: UserId;
+  readonly failureReason?: string;
+  readonly visibility?: VideoVisibility;
+  readonly status?: VideoStatus;
 }

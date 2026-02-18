@@ -1,8 +1,9 @@
 import axios from "axios";
 import { apiClient } from "../../api/client";
-import type { VideoId, Video, Tag } from "../../domain/video/video.model";
+import type { VideoId, Video, VideoTag, VideoStatus, VideoVisibility } from "../../domain/video/video.model";
 import type { GetPlaybackInfoResponse, IVideoRepository, VideoError } from "../../domain/video/video.repository";
 import { failure, success, type Result } from "../../domain/core/result";
+import { parseFindByTagResponse, parseFindMyVideosResponse, parseListPublicResponse } from "./video.dto";
 
 export class VideoRepositoryImpl implements IVideoRepository {
   // helper method to map axios errors to VideoError
@@ -27,20 +28,46 @@ export class VideoRepositoryImpl implements IVideoRepository {
   }
 
   async findPublicVideos(): Promise<Video[]> {
-    const { data } = await apiClient.get<Video[]>("/api/videos");
-    return data;
+    const { data } = await apiClient.get("/api/videos");
+
+    const dto = parseListPublicResponse(data);
+    return dto.items.map((item): Video => ({
+      id: item.id,
+      ownerId: item.ownerId,
+      title: item.title,
+      description: item.description,
+      tags: item.tags as VideoTag[],
+      createdAt: new Date(item.createdAt),
+    }))
   }
 
-  async findByTag(tag: Tag): Promise<Video[]> {
-    const { data } = await apiClient.get<Video[]>("/api/videos/search", {
+  async findByTag(tag: VideoTag): Promise<Video[]> {
+    const { data } = await apiClient.get("/api/videos/search", {
       params: { tag },
     })
-    return data;
+    const dto = parseFindByTagResponse(data);
+    return dto.items.map((item): Video => ({
+      id: item.id,
+      ownerId: item.ownerId,
+      title: item.title,
+      description: item.description,
+      tags: item.tags as VideoTag[],
+      createdAt: new Date(item.createdAt),
+    }));
   }
 
   async findMyVideos(): Promise<Video[]> {
-    const { data } = await apiClient.get<Video[]>("/api/videos/mine");
-    return data;
+    const { data } = await apiClient.get("/api/videos/mine");
+    const dto = parseFindMyVideosResponse(data);
+    return dto.items.map((item): Video => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      tags: item.tags as VideoTag[],
+      status: item.status as VideoStatus,
+      visibility: item.visibility as VideoVisibility,
+      createdAt: new Date(item.createdAt),
+    }));
   }
 
   async getPlaybackInfo(id: VideoId): Promise<Result<GetPlaybackInfoResponse, VideoError>> {
@@ -54,7 +81,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
     }
   }
 
-  async create(title: string, description: string, tags: Tag[]): Promise<Result<Video, VideoError>> {
+  async create(title: string, description: string, tags: VideoTag[]): Promise<Result<Video, VideoError>> {
     try {
       const { data } = await apiClient.post<Video>("/api/videos", {
         title,
