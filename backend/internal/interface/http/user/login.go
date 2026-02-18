@@ -9,7 +9,7 @@ import (
 )
 
 type DummyLoginResponse struct {
-	UserID  uuid.UUID `json:"user_id"`
+	UserID  uuid.UUID `json:"id"`
 	Name    string    `json:"name,omitempty"`
 	Bio     string    `json:"bio,omitempty"`
 	IconKey *string   `json:"icon_key,omitempty"`
