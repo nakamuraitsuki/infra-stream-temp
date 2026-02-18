@@ -9,7 +9,7 @@ import (
 )
 
 type DummyLoginResponse struct {
-	UserID  uuid.UUID `json:"id"`
+	ID  uuid.UUID `json:"id"`
 	Name    string    `json:"name,omitempty"`
 	Bio     string    `json:"bio,omitempty"`
 	IconKey *string   `json:"icon_key,omitempty"`
@@ -28,7 +28,7 @@ func (h *Handler) DummyLogin(c echo.Context) error {
 	})
 
 	return c.JSON(http.StatusOK, DummyLoginResponse{
-		UserID: uuid.Nil,
+		ID:   uuid.Nil,
 		Name:   "Dummy User",
 		Bio:    "This is a dummy user for development purposes.",
 		Role:   "user",
