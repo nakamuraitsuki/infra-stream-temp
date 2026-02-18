@@ -11,14 +11,14 @@ export type VideoStatus =
   | 'failed';
 
 export type Tag =
-  | 'competition_programing'
+  | 'competition_programming'
   | 'web_development'
   | 'machine_learning'
   | 'game_development'
   | 'infrastructure'
   | 'other';
 
-export type Visability = 'public' | 'private';
+export type Visibility = 'public' | 'private';
 
 export interface Video {
   readonly id: VideoId;
@@ -28,6 +28,6 @@ export interface Video {
   readonly description: string;
   readonly tags: Tag[];
   readonly failureReason?: string;
-  readonly visability?: Visability;
+  readonly visibility?: Visibility;
   readonly createdAt: Date;
 }
