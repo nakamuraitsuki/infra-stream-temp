@@ -1,14 +1,22 @@
 import axios from "axios";
 import { apiClient } from "../../api/client";
 import type { AuthSession } from "../../domain/auth/auth.model";
-import type { IAuthRepository } from "../../domain/auth/auth.repository";
+import type { AuthError, IAuthRepository } from "../../domain/auth/auth.repository";
 import type { User } from "../../domain/user/user.model";
+import { failure, success, type Result } from "../../domain/core/result";
 
 export class AuthRepositoryImpl implements IAuthRepository {
-  async login(_name: string, _password: string): Promise<User> {
+  async login(_name: string, _password: string): Promise<Result<User, AuthError>> {
     // NOTE: 現在はBackendにDummyLoginがあるので引数は使わない
-    const { data } = await apiClient.post<User>("/users/login");
-    return data;
+    try {
+      const { data } = await apiClient.post<User>("/users/login");
+      return success(data);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return failure("INVALID_CREDENTIALS");
+      }
+      throw error;
+    }
   }
 
   async logout(): Promise<void> {
