@@ -19,12 +19,15 @@ interface ServiceContextType {
 const ServiceContext = createContext<ServiceContextType | undefined>(undefined);
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
-  const services: ServiceContextType = {
-    authRepo: new AuthRepositoryImpl(),
-    userRepo: new UserRepositoryImpl(),
-    videoRepo: new VideoRepositoryImpl(),
-    videoAnalyzer: new HlsVideoAnalyzer(),
-  };
+  const services: ServiceContextType = React.useMemo(
+    () => ({
+      authRepo: new AuthRepositoryImpl(),
+      userRepo: new UserRepositoryImpl(),
+      videoRepo: new VideoRepositoryImpl(),
+      videoAnalyzer: new HlsVideoAnalyzer(),
+    }),
+    []
+  );
 
   return (
     <ServiceContext.Provider value={services}>
