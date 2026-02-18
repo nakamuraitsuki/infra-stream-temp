@@ -16,6 +16,7 @@ export class HlsVideoAnalyzer implements IVideoAnalyzer {
         const levels = data.levels;
         if (levels.length === 0) {
           hls.destroy();
+          return reject(new Error("No video levels found in HLS manifest"));
         }
 
         const qualities = levels
