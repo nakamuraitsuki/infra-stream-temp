@@ -5,12 +5,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterRoutes(e *echo.Echo, h *Handler) {
-	e.POST("/users", h.Register)
-	e.POST("/users/login", h.DummyLogin) // 認証不要な仮ログインエンドポイント
-	e.POST("/users/logout", h.Logout)
+func RegisterRoutes(g *echo.Group, h *Handler) {
+	g.POST("/users", h.Register)
+	g.POST("/users/login", h.DummyLogin) // 認証不要な仮ログインエンドポイント
+	g.POST("/users/logout", h.Logout)
 
-	auth := e.Group("/users")
+	auth := g.Group("/users")
 	auth.Use(middleware.DummyAuthMiddleware) // Dummy認証ミドルウェアを適用
 
 	auth.GET("/me", h.GetMe)
