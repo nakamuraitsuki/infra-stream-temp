@@ -12,7 +12,7 @@ export class UserRepositoryImpl implements IUserRepository {
   }
 
   async updateIcon(icon: File | null): Promise<Result<void, UpdateIconError>> {
-if (!icon) return failure<UpdateIconError>("INVALID_FORMAT");
+    if (!icon) return failure<UpdateIconError>("INVALID_FORMAT");
 
     const formData = new FormData();
     formData.append("file", icon);
