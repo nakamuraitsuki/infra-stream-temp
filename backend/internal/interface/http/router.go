@@ -14,12 +14,12 @@ func NewRouter(
 	vvh *viewer.VideoViewingHandler,
 ) *echo.Echo {
 	e := echo.New()
-
+	g := e.Group("/api")
 	// 共通ミドルウェア設定はここ
 
 	// 各ドメインのルート登録
-	user.RegisterRoutes(e, uh)
-	video.RegisterRoutes(e, vmh, vvh)
+	user.RegisterRoutes(g, uh)
+	video.RegisterRoutes(g, vmh, vvh)
 
 	return e
 }
