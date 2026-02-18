@@ -28,46 +28,61 @@ export class VideoRepositoryImpl implements IVideoRepository {
   }
 
   async findPublicVideos(): Promise<Video[]> {
-    const { data } = await apiClient.get("/api/videos");
+    try {
+      const { data } = await apiClient.get("/api/videos");
 
-    const dto = parseListPublicResponse(data);
-    return dto.items.map((item): Video => ({
-      id: item.id,
-      ownerId: item.ownerId,
-      title: item.title,
-      description: item.description,
-      tags: item.tags as VideoTag[],
-      createdAt: new Date(item.createdAt),
-    }))
+      const dto = parseListPublicResponse(data);
+      return dto.items.map((item): Video => ({
+        id: item.id,
+        ownerId: item.ownerId,
+        title: item.title,
+        description: item.description,
+        tags: item.tags as VideoTag[],
+        createdAt: new Date(item.createdAt),
+      }))
+    } catch (error) {
+      console.error("Failed to fetch public videos:", error);
+      return [];
+    }
   }
 
   async findByTag(tag: VideoTag): Promise<Video[]> {
-    const { data } = await apiClient.get("/api/videos/search", {
-      params: { tag },
-    })
-    const dto = parseFindByTagResponse(data);
-    return dto.items.map((item): Video => ({
-      id: item.id,
-      ownerId: item.ownerId,
-      title: item.title,
-      description: item.description,
-      tags: item.tags as VideoTag[],
-      createdAt: new Date(item.createdAt),
-    }));
+    try {
+      const { data } = await apiClient.get("/api/videos/search", {
+        params: { tag },
+      })
+      const dto = parseFindByTagResponse(data);
+      return dto.items.map((item): Video => ({
+        id: item.id,
+        ownerId: item.ownerId,
+        title: item.title,
+        description: item.description,
+        tags: item.tags as VideoTag[],
+        createdAt: new Date(item.createdAt),
+      }));
+    } catch (error) {
+      console.error(`Failed to search videos by tag "${tag}":`, error);
+      return [];
+    }
   }
 
   async findMyVideos(): Promise<Video[]> {
-    const { data } = await apiClient.get("/api/videos/mine");
-    const dto = parseFindMyVideosResponse(data);
-    return dto.items.map((item): Video => ({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      tags: item.tags as VideoTag[],
-      status: item.status as VideoStatus,
-      visibility: item.visibility as VideoVisibility,
-      createdAt: new Date(item.createdAt),
+    try {
+      const { data } = await apiClient.get("/api/videos/mine");
+      const dto = parseFindMyVideosResponse(data);
+      return dto.items.map((item): Video => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        tags: item.tags as VideoTag[],
+        status: item.status as VideoStatus,
+        visibility: item.visibility as VideoVisibility,
+        createdAt: new Date(item.createdAt),
     }));
+  } catch (error) {
+      console.error("Failed to fetch my videos:", error);
+      return [];
+    }
   }
 
   async getPlaybackInfo(id: VideoId): Promise<Result<GetPlaybackInfoResponse, VideoError>> {
