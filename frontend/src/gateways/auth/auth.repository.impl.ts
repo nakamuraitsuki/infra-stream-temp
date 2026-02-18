@@ -6,7 +6,7 @@ import type { User } from "../../domain/user/user.model";
 import { failure, success, type Result } from "../../domain/core/result";
 
 export class AuthRepositoryImpl implements IAuthRepository {
-  async login(_name: string, _password: string): Promise<Result<User, AuthError>> {
+  async login(_email: string, _password: string): Promise<Result<User, AuthError>> {
     // NOTE: 現在はBackendにDummyLoginがあるので引数は使わない
     try {
       const { data } = await apiClient.post<User>("/api/users/login");
