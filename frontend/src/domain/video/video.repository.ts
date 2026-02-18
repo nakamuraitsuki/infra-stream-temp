@@ -1,5 +1,5 @@
 import type { Result } from "../core/result";
-import type { Tag, Video, VideoId } from "./video.model";
+import type { VideoTag, Video, VideoId } from "./video.model";
 
 export interface GetPlaybackInfoResponse {
   playbackUrl: string; // Master playlist URL (e.g., HLS)
@@ -10,14 +10,14 @@ export interface IVideoRepository {
   findByID(id: VideoId): Promise<Result<Video, VideoError>>;
 
   findPublicVideos(): Promise<Video[]>;
-  findByTag(tag: Tag): Promise<Video[]>;
+  findByTag(tag: VideoTag): Promise<Video[]>;
   findMyVideos(): Promise<Video[]>;
 
   getPlaybackInfo(id: VideoId): Promise<Result<GetPlaybackInfoResponse, VideoError>>;
   create(
     title: string,
     description: string,
-    tags: Tag[],
+    tags: VideoTag[],
   ): Promise<Result<Video, VideoError>>;
   uploadSource(id: VideoId, file: File): Promise<Result<void, VideoError>>;
 }
