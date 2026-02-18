@@ -59,20 +59,35 @@ export class HlsVideoAnalyzer implements IVideoAnalyzer {
       video.onloadedmetadata = () => {
         URL.revokeObjectURL(objectUrl); // メモリ解放
 
+        const duration = video.duration;
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+
+        // Clean up video element to allow proper garbage collection
+        video.onloadedmetadata = null;
+        video.onerror = null;
+        video.src = "";
+
         resolve({
-          duration: video.duration,
-          width: video.videoWidth,
-          height: video.videoHeight,
+          duration,
+          width,
+          height,
           bitrate: 0, // local からはビットレートはわからないため0固定
           hasAudio: true, // 一旦true固定
-          qualities: [`${video.videoHeight}p`], 
-        })
-      }
+          qualities: [`${height}p`],
+        });
+      };
 
       video.onerror = (e) => {
         URL.revokeObjectURL(objectUrl); // メモリ解放
+
+        // Clean up video element to allow proper garbage collection
+        video.onloadedmetadata = null;
+        video.onerror = null;
+        video.src = "";
+
         reject(new Error(`Video analysis failed: ${e}`));
-      }
-    })
+      };
+    });
   }
 }
