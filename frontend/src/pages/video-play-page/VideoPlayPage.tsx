@@ -27,11 +27,12 @@ export const VideoPlayPage = () => {
     const video = videoRef.current;
     if (!video || !detail) return;
 
-    const { url: playbackUrl } = detail;
-
     if (!Hls.isSupported()) {
-      return setError("HLS is not supported in this browser");
+      setError("HLS is not supported in this browser");
+      return;
     }
+
+    const { url: playbackUrl } = detail;
     const hls = new Hls();
     hls.loadSource(playbackUrl);
     hls.attachMedia(video);
