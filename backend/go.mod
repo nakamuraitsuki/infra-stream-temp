@@ -17,6 +17,7 @@ require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/labstack/echo/v4 v4.15.0
+	github.com/lib/pq v1.10.9
 	golang.org/x/sync v0.19.0
 )
 

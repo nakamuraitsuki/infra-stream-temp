@@ -7,6 +7,7 @@ import (
 	video_domain "example.com/m/internal/domain/video"
 	"example.com/m/internal/domain/video/value"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 type videoModel struct {
@@ -22,7 +23,7 @@ type videoModel struct {
 	Visibility    string    `db:"visibility"`
 	CreatedAt     time.Time `db:"created_at"`
 	// Tags はJOINで取得するため，テーブルには含めない
-	Tags []string `db:"tags"`
+	Tags pq.StringArray `db:"tags"`
 	// event は Outbox パターンで使用するため除外
 }
 
