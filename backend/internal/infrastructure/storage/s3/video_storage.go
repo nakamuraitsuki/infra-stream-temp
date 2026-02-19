@@ -9,6 +9,7 @@ import (
 
 	"example.com/m/internal/domain/video"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
@@ -158,7 +159,9 @@ func (s *videoStorage) DeleteStream(ctx context.Context, streamKey string) error
 
 // Helper method to upload data to S3
 func (s *videoStorage) upload(ctx context.Context, key string, data io.Reader, contentType string) error {
-	_, err := s.client.PutObject(ctx, &s3.PutObjectInput{
+
+	uploader := transfermanager.New(s.client)
+	_, err := uploader.UploadObject(ctx, &transfermanager.UploadObjectInput{
 		Bucket:      aws.String(s.bucketName),
 		Key:         aws.String(key),
 		Body:        data,
