@@ -79,7 +79,7 @@ func (t *ffmpegTranscoder) Transcode(
 				"-i", sourcePath,
 				"-c:v", "libx264", "-c:a", "aac",
 				"-f", "hls",
-				"-hls_time", "10",
+				"-hls_time", "6",
 				"-hls_playlist_type", "vod",
 				"-hls_flags", "temp_file",
 				"-hls_segment_filename", segmentPattern,
