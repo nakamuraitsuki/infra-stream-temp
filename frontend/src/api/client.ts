@@ -7,10 +7,6 @@ export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || '',
   withCredentials: true,
   timeout: 30000,
-  headers: {
-    // NOTE: デフォルトでJSONを設定。別のフォーマットを使う際には上書きすること。
-    'Content-Type': 'application/json', 
-  }
 })
 
 // -- Request Interceptor --
