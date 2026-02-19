@@ -49,7 +49,7 @@ export const MyPage = () => {
         ) : error ? (
           <p>{error}</p>
         ) : videos.length === 0 ? (
-          <p> No videos found.</p>
+          <p>No videos found.</p>
         ) : (
           <div style={{ display: "grid", gap: "10px" }}>
             {videos.map((video) => (
