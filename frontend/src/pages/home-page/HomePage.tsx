@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export const HomePage = () => {
   const { login } = useLogin();
-  const navigator = useNavigate();
+  const navigate = useNavigate();
 
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +16,7 @@ export const HomePage = () => {
       setError("ログインに失敗しました");
       return;
     }
-    navigator("/my-page");
+    navigate("/my-page");
   }
 
   return (
