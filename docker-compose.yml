@@ -29,6 +29,8 @@ services:
       POSTGRES_DB: appdb
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # cf. https://hub.docker.com/_/postgres#initialization-scripts
+      - ./backend/deployments/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - internal
     restart: unless-stopped
