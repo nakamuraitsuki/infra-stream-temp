@@ -12,11 +12,14 @@ export const MyPage = () => {
 
   const { fetch, loading: listLoading } = useMyVideos();
   const [videos, setVideos] = useState<Video[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const loadList = async () => {
     const res = await fetch(MY_PAGE_LIMIT);
     if (res.type === "success") {
       setVideos(res.videos);
+    } else {
+      setError("Failed to load videos");
     }
   };
 
@@ -43,6 +46,8 @@ export const MyPage = () => {
         <h3>My Videos</h3>
         {listLoading ? (
           <p>Loading videos...</p>
+        ) : error ? (
+          <p>{error}</p>
         ) : videos.length === 0 ? (
           <p> No videos found.</p>
         ) : (
