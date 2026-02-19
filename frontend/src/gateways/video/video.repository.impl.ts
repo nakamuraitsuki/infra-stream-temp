@@ -27,9 +27,11 @@ export class VideoRepositoryImpl implements IVideoRepository {
     }
   }
 
-  async findPublicVideos(): Promise<Video[]> {
+  async findPublicVideos(limit: number): Promise<Video[]> {
     try {
-      const { data } = await apiClient.get("/api/videos");
+      const { data } = await apiClient.get("/api/videos", {
+        params: { limit },
+      });
 
       const dto = parseListPublicResponse(data);
       return dto.items.map((item): Video => ({
@@ -66,9 +68,11 @@ export class VideoRepositoryImpl implements IVideoRepository {
     }
   }
 
-  async findMyVideos(): Promise<Video[]> {
+  async findMyVideos(limit: number): Promise<Video[]> {
     try {
-      const { data } = await apiClient.get("/api/videos/mine");
+      const { data } = await apiClient.get("/api/videos/mine", {
+        params: { limit },
+      });
       const dto = parseFindMyVideosResponse(data);
       return dto.items.map((item): Video => ({
         id: item.id,
