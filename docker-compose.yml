@@ -1,14 +1,25 @@
 services:
-  backend:
+  backend-http:
     build:
       context: ./backend
-    container_name: app-backend
+      dockerfile: Dockerfile.http
+    container_name: app-backend-http
     env_file:
       - ./backend/.env
     networks:
       - internal
     restart: unless-stopped
 
+  backend-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.worker
+    container_name: app-backend-worker
+    env_file:
+      - ./backend/.env
+    networks:
+      - internal
+    restart: unless-stopped
   frontend:
     build:
       context: ./frontend
@@ -16,7 +27,7 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      - backend-http
     networks:
       - internal
     restart: unless-stopped
