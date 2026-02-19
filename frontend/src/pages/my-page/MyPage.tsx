@@ -30,7 +30,7 @@ export const MyPage = () => {
       navigate("/");
     }
     // NOTE: session が loading のときはスルーする
-  }, [session.status]);
+  }, [session.status, navigate]);
 
   if (session.status === "unauthenticated") return null;
 
