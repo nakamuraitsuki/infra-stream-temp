@@ -36,7 +36,7 @@ func (uc *VideoManagementUseCase) Create(
 	sourceKey := ""
 	streamKey := ""
 
-	visibility := video_value.VisibilityPrivate
+	visibility := video_value.VisibilityPublic
 
 	tags := make([]video_value.Tag, len(tagsStr))
 	for i, tagStr := range tagsStr {
