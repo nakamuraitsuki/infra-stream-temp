@@ -1,5 +1,6 @@
 import { type ReactNode } from "react"
 import { ServiceProvider } from "../context/ServiceContext"
+import { AuthProvider } from "../context/AuthContext"
 
 type Props = {
   children: ReactNode
@@ -8,7 +9,9 @@ type Props = {
 export function AppProviders({ children }: Props) {
   return (
     <ServiceProvider>
-      {children}
+      <AuthProvider>
+        {children}
+      </AuthProvider>
     </ServiceProvider>
   )
 }
