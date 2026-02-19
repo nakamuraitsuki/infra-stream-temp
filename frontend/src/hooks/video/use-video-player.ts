@@ -6,7 +6,7 @@ import type { VideoId } from "../../domain/video/video.model";
 export const useVideoPlayer = () => {
   const { videoRepo, videoAnalyzer } = useServices();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const execute = useMemo(
     () => getPlaybackDetail({ videoRepo, videoAnalyzer }),

@@ -15,8 +15,8 @@ export const useCreateVideo = () => {
   const { session } = useAuth();
   const { videoRepo } = useServices();
 
-  const [createLoading, setCreateLoading] = useState(false);
-  const [uploadLoading, setUploadLoading] = useState(false);
+  const [createLoading, setCreateLoading] = useState<boolean>(false);
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 
   const createMeta = useMemo(
     () => createVideoMetaUseCase({ session, videoRepo }),

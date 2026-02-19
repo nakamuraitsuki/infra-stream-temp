@@ -7,7 +7,7 @@ export const useMyVideos = () => {
   const { session } = useAuth();
   const { videoRepo } = useServices();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const execute = useMemo(
     () => getMyVideos({ videoRepo, session }),
