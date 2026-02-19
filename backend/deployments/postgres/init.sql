@@ -52,3 +52,8 @@ CREATE TABLE IF NOT EXISTS outbox (
 CREATE INDEX IF NOT EXISTS idx_videos_owner_id ON videos(owner_id);
 CREATE INDEX IF NOT EXISTS idx_outbox_occurred_at ON outbox(occurred_at ASC);
 CREATE INDEX IF NOT EXISTS idx_video_tags_tag_id ON video_tags(tag_id);
+
+-- テスト用のユーザーを作成
+INSERT INTO users (id, name, role, created_at)
+VALUES ('00000000-0000-0000-0000-000000000000', 'testuser', 'user', NOW())
+ON CONFLICT (id) DO NOTHING;
