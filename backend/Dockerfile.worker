@@ -12,11 +12,13 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -ldflags="-s -w" -o app-worker ./cmd/worker
 
 # Runtime Stage
-FROM gcr.io/distroless/base-debian12
+FROM alpine:3.19
+
+RUN apk add --no-cache ffmpeg
+
 WORKDIR /app
 COPY --from=builder /app/app-worker .
-EXPOSE 8080
 
-USER nonroot:nonroot
+USER nobody
 
 ENTRYPOINT [ "/app/app-worker" ]
