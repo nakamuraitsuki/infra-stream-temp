@@ -47,8 +47,9 @@ export const VideoUploadPage = () => {
 
 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         <div>
-          <label style={{ display: "block" }}>Title</label>
+          <label htmlFor="title" style={{ display: "block" }}>Title</label>
           <input
+            id="title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -58,8 +59,9 @@ export const VideoUploadPage = () => {
         </div>
 
         <div>
-          <label style={{ display: "block" }}>Description</label>
+          <label htmlFor="description" style={{ display: "block" }}>Description</label>
           <textarea
+            id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             style={{ width: "100%", height: "100px" }}
@@ -67,8 +69,9 @@ export const VideoUploadPage = () => {
         </div>
 
         <div>
-          <label style={{ display: "block" }}>Video File</label>
+          <label htmlFor="videoFile" style={{ display: "block" }}>Video File</label>
           <input
+            id="videoFile"
             type="file"
             accept="video/*"
             onChange={handleFileChange}
