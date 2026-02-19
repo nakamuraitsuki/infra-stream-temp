@@ -18,7 +18,7 @@ func (h *VideoViewingHandler) GetVideoStream(c echo.Context) error {
 	videoIDStr := c.Param("id")
 	videoID, err := uuid.Parse(videoIDStr)
 	if err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid video ID: "+err.Error())
 	}
 
 	objectPath := c.Param("*")
@@ -26,18 +26,18 @@ func (h *VideoViewingHandler) GetVideoStream(c echo.Context) error {
 	rangeHeader := c.Request().Header.Get("Range")
 	byteRangeQuery, err := h.parseRangeHeader(rangeHeader)
 	if err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid range header: "+err.Error())
 	}
 
 	stream, meta, mimeType, err := h.usecase.GetVideoStream(ctx, videoID, objectPath, byteRangeQuery)
 	if err != nil {
 		switch err {
 		case view.ErrVideoNotReady:
-			return echo.NewHTTPError(http.StatusConflict, "video not ready")
+			return echo.NewHTTPError(http.StatusConflict, "video not ready: "+err.Error())
 		case view.ErrVideoForbidden:
-			return echo.NewHTTPError(http.StatusForbidden, "video is not public")
+			return echo.NewHTTPError(http.StatusForbidden, "video is not public: "+err.Error())
 		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get video stream")
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get video stream: "+err.Error())
 		}
 	}
 	defer stream.Close()
@@ -107,24 +107,24 @@ func (v *VideoViewingHandler) parseRangeHeader(r string) (*query.VideoRangeQuery
 	}
 
 	if !strings.HasPrefix(r, "bytes=") {
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "invalid range header format")
 	}
 
 	rangeSpec := strings.TrimPrefix(r, "bytes=")
 	// Explicitly reject multipart byte ranges such as "bytes=0-499,1000-1499".
 	if strings.Contains(rangeSpec, ",") {
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "multipart byte ranges are not supported")
 	}
 
 	parts := strings.Split(rangeSpec, "-")
 	if len(parts) != 2 {
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "invalid range header format")
 	}
 
 	// NOTE: suffix-byte-range (RFC 7233 §2.1) is not supported.
 	start, err := strconv.ParseInt(parts[0], 10, 64)
 	if err != nil {
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "invalid range start value: "+err.Error())
 	}
 
 	if parts[1] == "" {
@@ -136,7 +136,7 @@ func (v *VideoViewingHandler) parseRangeHeader(r string) (*query.VideoRangeQuery
 
 	end, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "invalid range end value: "+err.Error())
 	}
 
 	return &query.VideoRangeQuery{

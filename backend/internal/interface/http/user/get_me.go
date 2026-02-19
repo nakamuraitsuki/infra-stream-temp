@@ -22,7 +22,7 @@ func (h *Handler) GetMe(c echo.Context) error {
 	ctx := c.Request().Context()
 	userInfo, err := h.usecase.GetMe(ctx, userID)
 	if err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(500, err.Error())
 	}
 
 	response := GetMeResponse{

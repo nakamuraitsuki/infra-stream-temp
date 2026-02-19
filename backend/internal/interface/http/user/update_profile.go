@@ -20,16 +20,16 @@ func (h *Handler) UpdateProfile(c echo.Context) error {
 
 	var req UpdateProfileRequest
 	if err := c.Bind(&req); err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(400, "invalid request body: "+err.Error())
 	}
 
 	if req.Name == nil && req.Bio == nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(400, "at least one of 'name' or 'bio' must be provided")
 	}
 
 	user, err := h.usecase.GetMe(ctx, userID)
 	if err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(500, "failed to get user info: "+err.Error())
 	}
 
 	name := user.Name
@@ -42,7 +42,7 @@ func (h *Handler) UpdateProfile(c echo.Context) error {
 	}
 
 	if err := h.usecase.UpdateProfile(ctx, userID, name, bio); err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(500, "failed to update profile: "+err.Error())
 	}
 
 	return c.NoContent(204)

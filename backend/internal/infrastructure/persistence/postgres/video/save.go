@@ -30,7 +30,7 @@ ON CONFLICT (id) DO UPDATE SET
 	description = EXCLUDED.description,
 	retry_count = EXCLUDED.retry_count,
 	failure_reason = EXCLUDED.failure_reason,
-	visibility = EXCLUDED.visibility,
+	visibility = EXCLUDED.visibility
 `
 	if _, err := sqlx.NamedExecContext(ctx, db, upsertVideoQuery, model); err != nil {
 		return fmt.Errorf("failed to save video: %w", err)

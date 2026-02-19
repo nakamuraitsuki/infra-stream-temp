@@ -1,6 +1,8 @@
 package viewer
 
 import (
+	"net/http"
+
 	"example.com/m/internal/usecase/video/query"
 	"github.com/labstack/echo/v4"
 )
@@ -31,14 +33,14 @@ func (h *VideoViewingHandler) SearchByTag(c echo.Context) error {
 		String("tag", &req.Tag).
 		Int("limit", &req.Limit).
 		BindError(); err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(400, "invalid query parameters: "+err.Error())
 	}
 
 	result, err := h.usecase.SearchByTag(ctx, req.Tag, query.VideoSearchQuery{
 		Limit: req.Limit,
 	})
 	if err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to search videos by tag: "+err.Error())
 	}
 
 	items := make([]SearchByTagResponseItem, len(result.Results))
