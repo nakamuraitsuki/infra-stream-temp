@@ -3,6 +3,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.http
+    cpus: 0.01
+    mem_limit: 6m
     container_name: app-backend-http
     env_file:
       - ./backend/.env
