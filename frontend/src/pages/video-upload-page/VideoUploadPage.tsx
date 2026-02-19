@@ -85,7 +85,7 @@ export const VideoUploadPage = () => {
         </button>
       </form>
 
-      {createLoading || uploadLoading && (
+      {(createLoading || uploadLoading) && (
         <div style={{ marginTop: "10px", fontSize: "0.9em", color: "#666" }}>
           ※ 処理を中断しないでください
         </div>
