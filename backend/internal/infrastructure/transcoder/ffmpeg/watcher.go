@@ -2,6 +2,7 @@ package ffmpeg
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
@@ -27,22 +28,24 @@ func (t *ffmpegTranscoder) watchAndQueue(
 		select {
 		// -- contextキャンセルの検知 --
 		case <-ctx.Done():
-			return ctx.Err()
+			log.Println("Watcher received shutdown signal, exiting...")
+			return nil
 
 		// -- ファイルイベントの検知 --
 		case event, ok := <-watcher.Events:
 			if !ok {
+				log.Println("Watcher event channel closed, exiting...")
 				return nil // watcherが閉じられた場合
 			}
 
 			// NOTE: ffmpegでtemp_fileフラグを使う前提
 			//       Rename を検知してアップロードする
-			if event.Op&fsnotify.Rename == fsnotify.Rename {
+			if event.Op&(fsnotify.Create|fsnotify.Rename|fsnotify.Write) != 0 {
 				if strings.HasSuffix(event.Name, ".ts") {
 					select {
 					case pathCh <- event.Name:
 					case <-ctx.Done():
-						return nil // contextがキャンセルされたら終了
+						return nil
 					}
 				}
 			}
@@ -50,9 +53,11 @@ func (t *ffmpegTranscoder) watchAndQueue(
 		// -- watcherのエラー検知 --
 		case err, ok := <-watcher.Errors:
 			if !ok {
+				log.Println("Watcher error channel closed, exiting...")
 				return nil // watcherが閉じられた場合
 			}
-			return err
+			log.Printf("Watcher error: %v", err)
+			return nil
 		}
 	}
 }

@@ -14,6 +14,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.worker
+    cpuset: "0-1"
+    mem_limit: 8g
     container_name: app-backend-worker
     env_file:
       - ./backend/.env

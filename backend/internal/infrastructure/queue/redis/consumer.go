@@ -56,12 +56,18 @@ func (c *consumer) Start(ctx context.Context) error {
 	eg, gCtx := errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
-		return c.workerPool(gCtx, TRANSCODE_WORKER_POOL_SIZE, jobCh)
+		log.Println("Starting Watcher...")
+		err := c.workerPool(gCtx, TRANSCODE_WORKER_POOL_SIZE, jobCh)
+		log.Println("Watcher stopped")
+		return err
 	})
 
 	eg.Go(func() error {
+		log.Println("watcher start")
 		defer close(jobCh) // watcherが終わったらworkerに終了を通知
-		return c.watcher(gCtx, jobCh)
+		err := c.watcher(gCtx, jobCh)
+		log.Println("watcher end")
+		return err
 	})
 
 	return eg.Wait()

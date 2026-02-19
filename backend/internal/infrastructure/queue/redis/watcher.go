@@ -16,8 +16,10 @@ func (c *consumer) watcher(
 	for {
 		select {
 		case <-ctx.Done():
+			log.Println("Watcher received shutdown signal, exiting...")
 			return nil
 		default:
+			log.Println("Waiting for jobs...")
 			res, err := c.client.Universal.BRPopLPush(ctx, c.key, c.processingKey, 5*time.Second).Result()
 			if err != nil {
 				if errors.Is(err, redis.Nil) {
@@ -30,7 +32,9 @@ func (c *consumer) watcher(
 
 			select {
 			case jobCh <- []byte(res):
+				log.Printf("Dispatched job to worker: %s", res)
 			case <-ctx.Done():
+				log.Println("Watcher received shutdown signal while dispatching, exiting...")
 				return nil
 			}
 		}

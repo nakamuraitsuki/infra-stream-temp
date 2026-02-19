@@ -3,6 +3,7 @@ package ffmpeg
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,14 +26,18 @@ func (t *ffmpegTranscoder) workerPool(
 				select {
 				// -- contextキャンセルの検知 --
 				case <-ctx.Done():
+					log.Println("Worker received shutdown signal, exiting...")
 					return nil // contextがキャンセルされたら終了
 
 				// -- アップロード --
 				case path, ok := <-pathCh:
 					if !ok {
+						log.Println("Path channel closed, worker exiting...")
 						return nil // channelが閉じられた場合
 					}
+					log.Printf("Worker received path: %s", path)
 					if err := t.uploadFile(ctx, path, streamKey); err != nil {
+						log.Printf("Failed to upload file: %v", err)
 						return err
 					}
 				}
