@@ -13,17 +13,17 @@ export type GetMyVideosDeps = {
 };
 
 export interface IGetMyVideosUseCase {
-  execute(): Promise<GetMyVideosResult>;
+  execute(limit: number): Promise<GetMyVideosResult>;
 }
 
 export const getMyVideos =
   ({ videoRepo, session }: GetMyVideosDeps): IGetMyVideosUseCase => ({
-    execute: async () => {
+    execute: async (limit: number) => {
       if (!session) {
         return { type: "unauthenticated" };
       }
       try {
-        const videos = await videoRepo.findMyVideos();
+        const videos = await videoRepo.findMyVideos(limit);
         return { type: "success", videos };
       } catch (error) {
         return { type: "failed", error: (error as Error).message };

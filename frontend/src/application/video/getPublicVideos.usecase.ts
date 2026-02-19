@@ -12,14 +12,14 @@ export type GetPublicVideosDeps = {
 };
 
 export interface IGetPublicVideosUseCase {
-  execute(): Promise<GetPublicVideosResult>;
+  execute(limit: number): Promise<GetPublicVideosResult>;
 }
 
 export const getPublicVideos =
   ({ videoRepo }: GetPublicVideosDeps): IGetPublicVideosUseCase => ({
-    execute: async () => {
+    execute: async (limit: number) => {
       try {
-        const videos = await videoRepo.findPublicVideos();
+        const videos = await videoRepo.findPublicVideos(limit);
         return { type: "success", videos };
       } catch (error) {
         return { type: "failed", error: (error as Error).message };

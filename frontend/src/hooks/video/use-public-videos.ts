@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useServices } from "../../context/ServiceContext";
-import { getPublicVideos } from "../../application/video/getPublicVideos";
+import { getPublicVideos } from "../../application/video/getPublicVideos.usecase";
 
 export const usePublicVideos = () => {
   const { session } = useAuth();
@@ -14,9 +14,9 @@ export const usePublicVideos = () => {
     [videoRepo, session]
   );
 
-  const fetch = async () => {
+  const fetch = async (limit: number) => {
     setLoading(true);
-    const res = await execute.execute();
+    const res = await execute.execute(limit);
     setLoading(false);
     return res;
   }
