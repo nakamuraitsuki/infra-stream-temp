@@ -4,7 +4,7 @@ import snakecaseKeys from 'snakecase-keys';
 
 // cf. https://axios-http.com/ja/docs/intro
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080',
   withCredentials: true,
   timeout: 30000,
   headers: {

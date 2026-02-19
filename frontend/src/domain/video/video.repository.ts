@@ -9,9 +9,9 @@ export interface GetPlaybackInfoResponse {
 export interface IVideoRepository {
   findByID(id: VideoId): Promise<Result<Video, VideoError>>;
 
-  findPublicVideos(): Promise<Video[]>;
+  findPublicVideos(limit: number): Promise<Video[]>;
   findByTag(tag: VideoTag): Promise<Video[]>;
-  findMyVideos(): Promise<Video[]>;
+  findMyVideos(limit: number): Promise<Video[]>;
 
   getPlaybackInfo(id: VideoId): Promise<Result<GetPlaybackInfoResponse, VideoError>>;
   create(
