@@ -71,10 +71,8 @@ func (t *ffmpegTranscoder) Transcode(
 			defer cancel(errors.New("ffmpeg finished")) // ffmpegが終わったらwatcherの loop も終了させる
 			segmentPattern := filepath.Join(tmpDir, "segment_%03d.ts")
 
-			ffCtx, ffCancel := context.WithCancelCause(context.Background())
-			defer ffCancel(errors.New("ffmpeg process finished"))
-
-			cmd := exec.CommandContext(ffCtx, "ffmpeg",
+			// ffmpeg プロセスのコンテキストには vCtx を直接使用し、上位 ctx のキャンセルでプロセスも終了するようにする
+			cmd := exec.CommandContext(vCtx, "ffmpeg",
 				"-threads", "1", // 本当は最適割当をしたいが、とりあえず制限
 				"-i", sourcePath,
 				"-c:v", "libx264", "-c:a", "aac",
