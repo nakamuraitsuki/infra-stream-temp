@@ -66,6 +66,8 @@ export const MyPage = () => {
                 }}
               >
                 <strong>{video.title}</strong>
+                <span>{video.status}</span>
+                <span>{video.visibility}</span>
                 <span>{video.tags.join(", ")}</span>
               </div>
             ))}

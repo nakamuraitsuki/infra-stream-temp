@@ -22,7 +22,8 @@ func (h *Handler) GetMe(c echo.Context) error {
 	ctx := c.Request().Context()
 	userInfo, err := h.usecase.GetMe(ctx, userID)
 	if err != nil {
-		return echo.ErrInternalServerError
+		c.Logger().Errorf("failed to get user info for userID=%s: %v", userID, err)
+		return echo.NewHTTPError(500, "failed to get user info")
 	}
 
 	response := GetMeResponse{

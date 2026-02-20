@@ -20,7 +20,7 @@ func (h *Handler) UpdateIcon(c echo.Context) error {
 	// multipart/form-data からファイルを取得
 	file, err := c.FormFile("file")
 	if err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(400, "failed to get uploaded file: "+err.Error())
 	}
 
 	if file.Size > MAX_ICON_FILE_SIZE {
@@ -29,20 +29,20 @@ func (h *Handler) UpdateIcon(c echo.Context) error {
 
 	src, err := file.Open()
 	if err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(500, "failed to open uploaded file: "+err.Error())
 	}
 	defer src.Close()
 
 	data, err := io.ReadAll(src)
 	if err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(500, "failed to read uploaded file: "+err.Error())
 	}
 
 	if err := h.usecase.UpdateIcon(ctx, userID, data); err != nil {
 		if httpErr, ok := err.(*echo.HTTPError); ok {
 			return httpErr
 		}
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(500, "failed to update icon: "+err.Error())
 	}
 
 	return c.NoContent(204)

@@ -2,7 +2,9 @@ package view
 
 import (
 	"context"
+	"errors"
 	"io"
+	"log"
 	"path"
 	"strings"
 	"time"
@@ -57,6 +59,7 @@ func (uc *VideoViewingUseCase) GetVideoStream(
 
 	fullKey := path.Join(video.StreamKey(), cleanPath)
 
+	log.Println("Getting video stream with key:", fullKey)
 	var byteRange *video_domain.ByteRange
 	if byteRangeQuery != nil {
 		byteRange = &video_domain.ByteRange{
@@ -67,7 +70,7 @@ func (uc *VideoViewingUseCase) GetVideoStream(
 
 	rc, meta, err := uc.Storage.GetStream(ctx, fullKey, byteRange)
 	if err != nil {
-		return nil, GetVideoStreamMeta{}, "", err
+		return nil, GetVideoStreamMeta{}, "", errors.New("failed to get video stream: " + fullKey + " - " + err.Error())
 	}
 
 	metaResult := GetVideoStreamMeta{

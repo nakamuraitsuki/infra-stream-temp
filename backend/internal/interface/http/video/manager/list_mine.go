@@ -34,14 +34,14 @@ func (h *VideoManagementHandler) ListMine(c echo.Context) error {
 
 	var req ListMineRequest
 	if err := c.Bind(&req); err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(400, "invalid query parameters: "+err.Error())
 	}
 
 	result, err := h.manageUsecase.ListMine(ctx, userID, query.VideoSearchQuery{
 		Limit: req.Limit,
 	})
 	if err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(500, err.Error())
 	}
 
 	items := make([]ListMineItem, len(result.Items))

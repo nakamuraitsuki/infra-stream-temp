@@ -18,18 +18,18 @@ func (h *VideoManagementHandler) UploadSource(c echo.Context) error {
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "failed to get uploaded file")
+		return echo.NewHTTPError(http.StatusBadRequest, "failed to get uploaded file: "+err.Error())
 	}
 
 	src, err := file.Open()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to open uploaded file")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to open uploaded file: "+err.Error())
 	}
 	defer src.Close()
 
 	err = h.manageUsecase.UploadAndStartTranscoding(ctx, videoID, src)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to upload video source")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to upload video source: "+err.Error())
 	}
 
 	return c.NoContent(http.StatusNoContent)

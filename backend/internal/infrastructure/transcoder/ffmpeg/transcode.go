@@ -2,8 +2,10 @@ package ffmpeg
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,6 +25,14 @@ func (t *ffmpegTranscoder) Transcode(
 	streamKey string,
 ) error {
 
+	log.Printf("ctx deadline: %v", func() any {
+		d, ok := ctx.Deadline()
+		if !ok {
+			return "none"
+		}
+		return d
+	}())
+
 	tmpDir, err := os.MkdirTemp("", "transcode-*")
 	if err != nil {
 		return err
@@ -39,7 +49,10 @@ func (t *ffmpegTranscoder) Transcode(
 	eg, gCtx := errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
-		return t.workerPool(gCtx, UPLOAD_WORKER_POOL_SIZE, pathCh, streamKey)
+		log.Println("Starting worker pool...")
+		err := t.workerPool(gCtx, UPLOAD_WORKER_POOL_SIZE, pathCh, streamKey)
+		log.Println("Worker pool stopped", err)
+		return nil // workerPool内でエラーはログに出力しているので、ここでは常にnilを返す
 	})
 
 	eg.Go(func() error {
@@ -47,22 +60,24 @@ func (t *ffmpegTranscoder) Transcode(
 		defer close(pathCh)
 
 		vEg, vCtx := errgroup.WithContext(gCtx)
-		vCtx, cancel := context.WithCancel(vCtx)
-		defer cancel()
+		vCtx, cancel := context.WithCancelCause(vCtx)
+		defer cancel(errors.New("ffmpeg and watcher finished"))
 
 		vEg.Go(func() error {
 			return t.watchAndQueue(vCtx, tmpDir, pathCh)
 		})
 
 		vEg.Go(func() error {
-			defer cancel() // ffmpegが終わったらwatcherの loop も終了させる
+			defer cancel(errors.New("ffmpeg finished")) // ffmpegが終わったらwatcherの loop も終了させる
 			segmentPattern := filepath.Join(tmpDir, "segment_%03d.ts")
 
-			cmd := exec.CommandContext(gCtx, "ffmpeg",
+			// ffmpeg プロセスのコンテキストには vCtx を直接使用し、上位 ctx のキャンセルでプロセスも終了するようにする
+			cmd := exec.CommandContext(vCtx, "ffmpeg",
+				"-threads", "1", // 本当は最適割当をしたいが、とりあえず制限
 				"-i", sourcePath,
 				"-c:v", "libx264", "-c:a", "aac",
 				"-f", "hls",
-				"-hls_time", "10",
+				"-hls_time", "6",
 				"-hls_playlist_type", "vod",
 				"-hls_flags", "temp_file",
 				"-hls_segment_filename", segmentPattern,

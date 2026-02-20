@@ -28,12 +28,12 @@ func (h *VideoManagementHandler) Create(c echo.Context) error {
 
 	var req CreateRequest
 	if err := c.Bind(&req); err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
-		return echo.ErrUnauthorized
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
 	res, err := h.manageUsecase.Create(
@@ -44,7 +44,7 @@ func (h *VideoManagementHandler) Create(c echo.Context) error {
 		req.Tags,
 	)
 	if err != nil {
-		return echo.ErrInternalServerError
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	resp := CreateResponse{

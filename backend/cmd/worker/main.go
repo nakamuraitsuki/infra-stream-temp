@@ -75,18 +75,27 @@ func main() {
 
 	eg, ctx := errgroup.WithContext(ctx)
 
+	go func() {
+		<-ctx.Done() // シグナルを待つ
+		log.Printf("ROOT CTX DONE: %v", ctx.Err())
+		log.Printf("ROOT CASE: %v", context.Cause(ctx))
+	}()
+
 	// Relay Worker の起動
 	eg.Go(func() error {
-		log.Println("Starting Relay Worker...")
-		return relayWorker.Start(ctx)
+		log.Println("Relay Worker start")
+		err := relayWorker.Start(ctx)
+		log.Printf("Relay Worker exit: %v", err)
+		return err
 	})
 
 	// Consumer の起動
 	eg.Go(func() error {
-		log.Println("Starting Job Consumer...")
-		return jobConsumer.Start(ctx)
+		log.Println("Job Consumer start")
+		err := jobConsumer.Start(ctx)
+		log.Printf("Job Consumer exit: %v", err)
+		return err
 	})
-
 	// いずれかのWorkerがエラーを出すか、中断信号が来たら終了
 	if err := eg.Wait(); err != nil {
 		log.Printf("Worker stopped with error: %v", err)

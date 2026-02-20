@@ -24,18 +24,18 @@ func (h *VideoViewingHandler) GetByID(c echo.Context) error {
 	videoIDStr := c.Param("id")
 	videoID, err := uuid.Parse(videoIDStr)
 	if err != nil {
-		return echo.ErrBadRequest
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid video ID: "+err.Error())
 	}
 
 	result, err := h.usecase.GetByID(ctx, videoID)
 	if err != nil {
 		switch err {
 		case view_usecase.ErrVideoNotReady:
-			return echo.NewHTTPError(http.StatusNotFound, "video is not ready for playback")
+			return echo.NewHTTPError(http.StatusNotFound, "video is not ready for playback: "+err.Error())
 		case view_usecase.ErrVideoForbidden:
-			return echo.NewHTTPError(http.StatusForbidden, "video is not accessible")
+			return echo.NewHTTPError(http.StatusForbidden, "video is not accessible: "+err.Error())
 		default:
-			return echo.ErrInternalServerError
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get video: "+err.Error())
 		}
 	}
 
