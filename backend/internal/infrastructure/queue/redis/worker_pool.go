@@ -31,7 +31,7 @@ func (c *consumer) workerPool(
 					}
 					if err := c.dispatch(ctx, job); err != nil {
 						log.Printf("Failed to dispatch job: %v", err)
-						continue
+						return err
 					}
 				}
 			}
