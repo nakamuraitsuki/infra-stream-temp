@@ -32,7 +32,7 @@ func (c *consumer) watcher(
 
 			select {
 			case jobCh <- []byte(res):
-				log.Printf("Dispatched job to worker: %s", res)
+				log.Printf("Dispatched job to worker from queue: %s", c.key)
 			case <-ctx.Done():
 				log.Println("Watcher received shutdown signal while dispatching, exiting...")
 				return nil
