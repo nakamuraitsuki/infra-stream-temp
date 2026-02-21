@@ -2,6 +2,8 @@
   font-family: system-ui, sans-serif;
   line-height: 1.5;
 
+  --white: #fff;
+  --black: #000;
   --primary: #646cff;
   --primary-hover: #535bf2;
   --bg-color: #242424;
