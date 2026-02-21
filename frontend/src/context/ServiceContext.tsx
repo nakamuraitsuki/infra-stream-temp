@@ -8,6 +8,8 @@ import { AuthRepositoryImpl } from "../gateways/auth/auth.repository.impl";
 import { UserRepositoryImpl } from "../gateways/user/user.repository.impl";
 import { VideoRepositoryImpl } from "../gateways/video/video.repository.impl";
 import { HlsVideoAnalyzer } from "../gateways/video/video.service.impl";
+import { VideoRepositoryMock } from "../gateways/video/video.repository.mock";
+import { AuthRepositoryMock } from "../gateways/auth/auth.repository.mock";
 
 interface ServiceContextType {
   authRepo: IAuthRepository;
@@ -19,10 +21,12 @@ interface ServiceContextType {
 const ServiceContext = createContext<ServiceContextType | undefined>(undefined);
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
+  const isMock = import.meta.env.VITE_USE_MOCK === "true";
+
   const services: ServiceContextType = {
-    authRepo: new AuthRepositoryImpl(),
+    authRepo: isMock ? new AuthRepositoryMock() : new AuthRepositoryImpl(),
     userRepo: new UserRepositoryImpl(),
-    videoRepo: new VideoRepositoryImpl(),
+    videoRepo: isMock ? new VideoRepositoryMock() : new VideoRepositoryImpl(),
     videoAnalyzer: new HlsVideoAnalyzer(),
   };
 
