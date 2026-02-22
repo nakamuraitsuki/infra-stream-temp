@@ -1,6 +1,6 @@
 import type { Video, VideoId } from "@/domain/video/video.model"
 import styles from "./PublicVideoCard.module.css";
-import { VideoThumbnail } from "../../thumbnail";
+import { VideoThumbnailCanvas } from "../../thumbnail";
 
 type Props = {
   video: Video;
@@ -14,7 +14,7 @@ export const PublicVideoCard = ({ video, onClick }: Props) => {
       onClick={() => onClick?.(video.id)}
     >
       <div className={styles.thumbnail}>
-        <VideoThumbnail
+        <VideoThumbnailCanvas
           videoId={video.id}
           title={video.title}
         />

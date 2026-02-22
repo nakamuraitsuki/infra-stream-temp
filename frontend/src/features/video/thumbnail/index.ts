@@ -1,1 +1,1 @@
-export * from "./components/VideoThumbnail";
+export * from "./components/VideoThumbnailCanvas";
