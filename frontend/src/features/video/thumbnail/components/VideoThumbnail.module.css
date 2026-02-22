@@ -7,11 +7,18 @@
   font-family: var(--font-family, system-ui, sans-serif);
 }
 
-.overlay {
+.overlayNormal {
   position: absolute;
   inset: 0;
-  background-color: var(--color-overlay);
+  background-color: rgba(0, 0, 0, 0.2); /* 見れる動画用 */
 }
+
+.overlayUnavailable {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* 見れない動画用 */
+}
+
 
 .title {
   position: absolute;

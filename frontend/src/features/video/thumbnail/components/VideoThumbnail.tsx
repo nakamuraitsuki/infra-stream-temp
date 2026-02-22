@@ -5,22 +5,24 @@ import { hashStringToIndex } from "../utils/hash";
 type Props = {
   videoId: VideoId;
   title: string;
+  status?: string;
 }
 
 const gradientClasses = [
-  styles.grandient0,
-  styles.grandient1,
-  styles.grandient2,
-  styles.grandient3,
+  styles.gradient0,
+  styles.gradient1,
+  styles.gradient2,
+  styles.gradient3,
 ]
 
-export const VideoThumbnail = ({ videoId, title }: Props) => {
+export const VideoThumbnail = ({ videoId, title, status = "ready" }: Props) => {
   const index = hashStringToIndex(videoId as string, gradientClasses.length);
   const backgroundClass = gradientClasses[index];
 
+  const overlayClass = status === "ready" ? styles.overlayNormal : styles.overlayUnavailable;
   return (
     <div className={`${styles.thumbnail} ${backgroundClass}`}>
-      <div className={styles.overlay} />
+      <div className={overlayClass} />
       <div className={styles.title}>{title}</div>
     </div>
   );
