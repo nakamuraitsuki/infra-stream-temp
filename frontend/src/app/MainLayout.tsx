@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router"
+import { NavLink, Outlet } from "react-router"
 import styles from "./MainLayout.module.css"
 import { useAuth } from "../context/AuthContext"
 
@@ -8,17 +8,44 @@ export const MainLayout = () => {
     <div className={styles.wrapper}>
       <header className={styles.header}>
         <div className={styles.inner}>
-          <Link to="/" className={styles.logo}>
+          <NavLink to="/" className={styles.logo}>
             Infra Stream
-          </Link>
+          </NavLink>
           <nav className={styles.nav}>
-            <Link to="/" className={styles.navLink}>Home</Link>
-            { session.status === "authenticated" ? (
-              <Link to="/upload" className={styles.navLink}>Library</Link>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive
+                  ? `${styles.navLink} ${styles.active}`
+                  : styles.navLink
+              }
+            >
+              Home
+            </NavLink>
+            {session.status === "authenticated" ? (
+              <NavLink
+                to="/my-page"
+                className={({ isActive }) =>
+                  isActive
+                    ? `${styles.navLink} ${styles.active}`
+                    : styles.navLink
+                }
+              >
+                Library
+              </NavLink>
             ) : session.status === "unauthenticated" ? (
-              <Link to="/login">Login</Link>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  isActive
+                    ? `${styles.navLink} ${styles.active}`
+                    : styles.navLink
+                }
+              >
+                Login
+              </NavLink>
             ) : (
-              <p>Loading...</p>
+              <span className={styles.loading}>Loading...</span>
             )}
           </nav>
         </div>

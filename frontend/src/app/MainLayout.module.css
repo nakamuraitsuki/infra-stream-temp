@@ -60,3 +60,8 @@
   color: var(--color-primary);
   font-weight: 600;
 }
+
+.loading {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
