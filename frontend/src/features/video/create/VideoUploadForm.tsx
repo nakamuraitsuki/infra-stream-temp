@@ -1,24 +1,20 @@
-import { useNavigate } from "react-router"
-import { useCreateVideo } from "@/features/video/create/use-create-video";
 import { useState } from "react";
-import type { VideoTag } from "../../../domain/video/video.model";
+import type { VideoTag } from "@/domain/video/video.model";
+import { useCreateVideo } from "./use-create-video";
 
-export const VideoUploadPage = () => {
-  const navigate = useNavigate();
+type Props = {
+  onSuccess: () => void;
+  onBack: () => void;
+};
+
+export const VideoUploadForm = ({ onSuccess, onBack }: Props) => {
   const { createVideo, createLoading, uploadLoading } = useCreateVideo();
 
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [tags, _setTags] = useState<VideoTag[]>([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags] = useState<VideoTag[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-    }
-  };
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,11 +26,11 @@ export const VideoUploadPage = () => {
       title,
       description,
       tags,
-      file,
+      file
     );
 
     if (res.type === "success") {
-      navigate("/my-page");
+      onSuccess();
     } else {
       setError(`${res.type}: ${res.error}`);
     }
@@ -42,12 +38,16 @@ export const VideoUploadPage = () => {
 
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <button onClick={() => navigate(-1)}>Back</button>
+      <button onClick={onBack}>Back</button>
+
       <h2>Upload New Video</h2>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+      >
         <div>
-          <label htmlFor="title" style={{ display: "block" }}>Title</label>
+          <label htmlFor="title">Title</label>
           <input
             id="title"
             type="text"
@@ -59,7 +59,7 @@ export const VideoUploadPage = () => {
         </div>
 
         <div>
-          <label htmlFor="description" style={{ display: "block" }}>Description</label>
+          <label htmlFor="description">Description</label>
           <textarea
             id="description"
             value={description}
@@ -69,22 +69,27 @@ export const VideoUploadPage = () => {
         </div>
 
         <div>
-          <label htmlFor="videoFile" style={{ display: "block" }}>Video File</label>
+          <label htmlFor="videoFile">Video File</label>
           <input
             id="videoFile"
             type="file"
             accept="video/*"
-            onChange={handleFileChange}
             required
+            onChange={(e) => {
+              const selected = e.target.files?.[0];
+              if (selected) setFile(selected);
+            }}
           />
         </div>
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         <button type="submit" disabled={createLoading || uploadLoading}>
-          {createLoading ? "Creating Metadata..." :
-            uploadLoading ? "Uploading Video File..." :
-              "Start Upload"}
+          {createLoading
+            ? "Creating Metadata..."
+            : uploadLoading
+            ? "Uploading Video File..."
+            : "Start Upload"}
         </button>
       </form>
 
@@ -94,5 +99,5 @@ export const VideoUploadPage = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};

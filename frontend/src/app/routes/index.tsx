@@ -1,2 +1,4 @@
-export * from "./public/home/HomePage";
-export * from "./protected/my-page/MyPage";
+export * from "./public/home/page";
+export * from "./public/video/_videoId/page";
+export * from "./protected/my-page/page";
+export * from "./protected/upload/page";
