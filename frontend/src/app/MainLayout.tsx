@@ -1,7 +1,9 @@
 import { Link, Outlet } from "react-router"
 import styles from "./MainLayout.module.css"
+import { useAuth } from "../context/AuthContext"
 
 export const MainLayout = () => {
+  const { session } = useAuth();
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
@@ -11,7 +13,13 @@ export const MainLayout = () => {
           </Link>
           <nav className={styles.nav}>
             <Link to="/" className={styles.navLink}>Home</Link>
-            <Link to="/my-page" className={styles.navLink}>Library</Link>
+            { session.status === "authenticated" ? (
+              <Link to="/upload" className={styles.navLink}>Library</Link>
+            ) : session.status === "unauthenticated" ? (
+              <Link to="/login">Login</Link>
+            ) : (
+              <p>Loading...</p>
+            )}
           </nav>
         </div>
       </header>
