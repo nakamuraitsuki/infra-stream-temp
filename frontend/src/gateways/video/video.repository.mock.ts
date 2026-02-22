@@ -84,6 +84,7 @@ export class VideoRepositoryMock implements IVideoRepository {
   }
 
   async findMyVideos(limit: number): Promise<Video[]> {
+    await new Promise((resolve) => setTimeout(resolve, 1500)); // 擬似的な遅延
     return this.mockVideos.filter(video => video.ownerId === "1").slice(0, limit);
   }
 
