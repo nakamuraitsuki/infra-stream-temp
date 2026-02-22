@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext"
-import { useServices } from "../../context/ServiceContext";
-import type { VideoTag } from "../../domain/video/video.model";
-import { createVideoMetaUseCase } from "../../application/video/createVideoMeta.usecase";
-import { uploadVideoSource } from "../../application/video/uploadVideoSource.usecase";
+import { useAuth } from "@/context/AuthContext"
+import { useServices } from "@/context/ServiceContext";
+import type { VideoTag } from "@/domain/video/video.model";
+import { createVideoMetaUseCase } from "@/application/video/createVideoMeta.usecase";
+import { uploadVideoSource } from "@/application/video/uploadVideoSource.usecase";
 
 export type CreateVideoResult =
   | { type: "success"; videoId: string }

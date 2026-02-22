@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
-import { useServices } from "../../context/ServiceContext"
-import { getPlaybackDetail, type GetPlaybackDetailResult } from "../../application/video/getPlaybackDetail.usecase";
-import type { VideoId } from "../../domain/video/video.model";
+import { useServices } from "@/context/ServiceContext"
+import { getPlaybackDetail, type GetPlaybackDetailResult } from "@/application/video/getPlaybackDetail.usecase";
+import type { VideoId } from "@/domain/video/video.model";
 
 export const useVideoPlayer = () => {
   const { videoRepo, videoAnalyzer } = useServices();

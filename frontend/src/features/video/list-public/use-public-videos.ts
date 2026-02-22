@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { useServices } from "../../context/ServiceContext";
-import { getPublicVideos } from "../../application/video/getPublicVideos.usecase";
+import { useAuth } from "@/context/AuthContext";
+import { useServices } from "@/context/ServiceContext";
+import { getPublicVideos } from "@/application/video/getPublicVideos.usecase";
 
 export const usePublicVideos = () => {
   const { session } = useAuth();
