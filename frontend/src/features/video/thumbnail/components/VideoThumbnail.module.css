@@ -1,0 +1,65 @@
+.thumbnail {
+  position: relative;
+  aspect-ratio: 16/9;
+  width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  font-family: var(--font-family, system-ui, sans-serif);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-overlay);
+}
+
+.title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 1.125rem;
+  text-align: center;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gradient0 {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    #7f7aff 100%
+  );
+}
+
+.gradient1 {
+  background: linear-gradient(
+    135deg,
+    #4ade80, /* emerald 400 系 */
+    #22d3ee  /* cyan 400 系 */
+  );
+}
+
+.gradient2 {
+  background: linear-gradient(
+    135deg,
+    #f87171, /* red 400 系 */
+    #fb923c  /* orange 400 系 */
+  );
+}
+
+.gradient3 {
+  background: linear-gradient(
+    135deg,
+    #60a5fa, /* blue 400 系 */
+    #3b82f6  /* blue 500 系 */
+  );
+}

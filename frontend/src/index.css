@@ -11,6 +11,9 @@
   --color-surfface: #f8f8f8;
   --color-mutex-surface: #f1f3f5;
 
+  /* Overlay */
+  --color-overlay: rgba(0, 0, 0, 0.3);
+
   /* Text */
   --color-text-primary: #111827;
   --color-text-secondary: #6b7280;
