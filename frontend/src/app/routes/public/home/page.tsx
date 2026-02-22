@@ -1,32 +1,22 @@
 import { useNavigate } from "react-router";
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { PublicVideoList } from "@/features/video/list-public";
 
 export const HomePage = () => {
-  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [error, setError] = useState<string | null>(null);
-
-  const onLoginClick = async () => {
-    setError(null);
-    // ダミーユーザーでログイン
-    const res = await login("dummy_user", "dummy_password");
-    if (!res.success) {
-      setError("ログインに失敗しました");
-      return;
-    }
-    navigate("/my-page");
-  }
+  const handleVideoSelect = (videoId: string) => {
+    // 選択した動画の詳細ページに遷移
+    navigate(`/videos/${videoId}`);
+  };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Home</h2>
-      <p>デモ用にダミーログインを行う</p>
-      <button onClick={onLoginClick} style={{ padding: "10px 20px" }}>
-        Login( Set Dummy User )
-      </button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "1rem" }}>
+      <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>Home</h2>
+
+      <section>
+        <h3 style={{ marginBottom: "1rem" }}>Public Videos</h3>
+        <PublicVideoList limit={20} onSelect={handleVideoSelect} />
+      </section>
     </div>
-  )
-}
+  );
+};
