@@ -1,7 +1,7 @@
 import type { Video, VideoId } from "@/domain/video/video.model";
 import { usePublicVideosQuery } from "../hooks/usePublicVideosQuery";
-import styles from "./PublicVideoList.module.css";
 import { PublicVideoCard } from "./PublicVideoCard";
+import styles from "./PublicVideoList.module.css";
 
 type Props = {
   limit?: number;

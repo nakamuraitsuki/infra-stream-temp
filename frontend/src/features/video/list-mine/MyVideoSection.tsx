@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { type Video } from "@/domain/video/video.model";
-import { useMyVideos } from "./use-my-videos";
+import { useMyVideos } from "./hooks/use-my-videos";
 
 type Props = {
   limit: number;
