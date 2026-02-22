@@ -13,12 +13,13 @@ export const PublicVideoCard = ({ video, onClick }: Props) => {
       className={styles.card}
       onClick={() => onClick?.(video.id)}
     >
-      <VideoThumbnail
-        videoId={video.id}
-        title={video.title}
-      />
+      <div className={styles.thumbnail}>
+        <VideoThumbnail
+          videoId={video.id}
+          title={video.title}
+        />
+      </div>
       <div className={styles.cardBody}>
-        <h4 className={styles.title}>{video.title}</h4>
         <p className={styles.description}>{video.description}</p>
       </div>
     </div>

@@ -76,7 +76,7 @@ export class VideoRepositoryMock implements IVideoRepository {
   }
 
   async findPublicVideos(limit: number): Promise<Video[]> {
-    return this.mockVideos.filter(video => video.visibility === "public").slice(0, limit);
+    return this.mockVideos.filter(video => video.visibility === "public" && video.status === "ready").slice(0, limit);
   }
 
   async findByTag(tag: VideoTag): Promise<Video[]> {

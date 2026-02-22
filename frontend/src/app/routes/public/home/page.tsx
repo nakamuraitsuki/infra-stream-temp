@@ -6,7 +6,7 @@ export const HomePage = () => {
 
   const handleVideoSelect = (videoId: string) => {
     // 選択した動画の詳細ページに遷移
-    navigate(`/videos/${videoId}`);
+    navigate(`/video/${videoId}`);
   };
 
   return (
