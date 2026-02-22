@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router"
-import { useCreateVideo } from "../../hooks/video/use-create-video";
+import { useCreateVideo } from "@/features/video/create/use-create-video";
 import { useState } from "react";
-import type { VideoTag } from "../../domain/video/video.model";
+import type { VideoTag } from "../../../domain/video/video.model";
 
 export const VideoUploadPage = () => {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ export const VideoUploadPage = () => {
       <button onClick={() => navigate(-1)}>Back</button>
       <h2>Upload New Video</h2>
 
-<form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         <div>
           <label htmlFor="title" style={{ display: "block" }}>Title</label>
           <input
@@ -82,9 +82,9 @@ export const VideoUploadPage = () => {
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         <button type="submit" disabled={createLoading || uploadLoading}>
-          {createLoading ? "Creating Metadata..." : 
-           uploadLoading ? "Uploading Video File..." : 
-           "Start Upload"}
+          {createLoading ? "Creating Metadata..." :
+            uploadLoading ? "Uploading Video File..." :
+              "Start Upload"}
         </button>
       </form>
 

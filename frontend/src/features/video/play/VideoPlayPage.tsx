@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router";
-import { useVideoPlayer } from "../../hooks/video/use-video-player";
+import { useVideoPlayer } from "@/features/video/play/use-video-player";
 import { useEffect, useRef, useState } from "react";
-import type { PlaybackDetail } from "../../application/video/getPlaybackDetail.usecase";
+import type { PlaybackDetail } from "../../../application/video/getPlaybackDetail.usecase";
 import Hls from "hls.js";
 
 export const VideoPlayPage = () => {

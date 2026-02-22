@@ -1,9 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router"
-import { HomePage } from "../pages/home-page/HomePage"
-import { MyPage } from "../pages/my-page/MyPage"
-import { VideoUploadPage } from "../pages/video-upload-page/VideoUploadPage"
-import { VideoPlayPage } from "../pages/video-play-page/VideoPlayPage"
+import { VideoUploadPage } from "../features/video/create/VideoUploadPage"
+import { VideoPlayPage } from "../features/video/play/VideoPlayPage"
 import { MainLayout } from "./MainLayout"
+import { HomePage, MyPage } from "./routes"
 
 export const router = createBrowserRouter([
   {

@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router";
-import { useLogin } from "../../hooks/auth/use-login"
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export const HomePage = () => {
-  const { login } = useLogin();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [error, setError] = useState<string | null>(null);
