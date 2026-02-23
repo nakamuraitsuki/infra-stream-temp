@@ -19,7 +19,7 @@ export interface IVideoRepository {
     description: string,
     tags: VideoTag[],
   ): Promise<Result<Video, VideoError>>;
-  uploadSource(id: VideoId, file: File): Promise<Result<void, VideoError>>;
+  uploadSource(id: VideoId, file: File, onProgress?: (progress: number) => void): Promise<Result<void, VideoError>>;
 }
 
 export type VideoError = 
