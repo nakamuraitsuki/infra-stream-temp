@@ -108,7 +108,7 @@ export class VideoRepositoryMock implements IVideoRepository {
     return failure("UNKNOWN_ERROR"); // 動画作成はモックではサポートしない
   }
 
-  async uploadSource(_id: VideoId, _file: File): Promise<Result<void, VideoError>> {
+  async uploadSource(_id: VideoId, _file: File, _onProgress: (progress: number) => void): Promise<Result<void, VideoError>> {
     return failure("UNKNOWN_ERROR"); // 動画アップロードはモックではサポートしない
   }
 }
