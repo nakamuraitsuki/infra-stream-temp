@@ -1,16 +1,22 @@
 import { useNavigate, useParams } from "react-router";
-import { VideoPlayer } from "@/features/video/play/VideoPlayer";
+import { VideoPlayerContainer } from "@/features/video/play";
 
 export const VideoPlayPage = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
 
-  if (!videoId) return null;
+  // IDがない場合は不正なアクセスとして処理
+  if (!videoId) {
+    navigate("/my", { replace: true });
+    return null;
+  }
 
   return (
-    <VideoPlayer
-      videoId={videoId}
-      onErrorBack={() => navigate("/my")}
-    />
+    <div style={{ container: "var(--container-width)", margin: "0 auto" }}>
+      <VideoPlayerContainer
+        videoId={videoId}
+        onErrorBack={() => navigate("/my")}
+      />
+    </div>
   );
 };
