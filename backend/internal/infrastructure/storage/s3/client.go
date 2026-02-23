@@ -43,6 +43,28 @@ func NewClient(ctx context.Context, cfg Config) (*s3.Client, error) {
 			return nil, err
 		}
 	}
+	if err := applyCORS(ctx, client, cfg.BucketName); err != nil {
+		return nil, err
+	}
 
 	return client, nil
+}
+
+// helper function to CORS
+func applyCORS(ctx context.Context, client *s3.Client, bucketName string) error {
+	_, err := client.PutBucketCors(ctx, &s3.PutBucketCorsInput{
+		Bucket: aws.String(bucketName),
+		CORSConfiguration: &types.CORSConfiguration{
+			CORSRules: []types.CORSRule{
+				{
+					AllowedOrigins: []string{"*"},
+					AllowedMethods: []string{"GET", "PUT", "POST", "DELETE", "HEAD"},
+					AllowedHeaders: []string{"*"},
+					ExposeHeaders:  []string{"ETag"},
+					MaxAgeSeconds:  aws.Int32(3000),
+				},
+			},
+		},
+	})
+	return err
 }
