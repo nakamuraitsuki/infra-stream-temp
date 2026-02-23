@@ -1,0 +1,45 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+
+  transition: background-color 0.2s, border-color 0.1s;
+  user-select: none;
+}
+
+.button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.buttonDisabled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+
+  background-color: var(--color-muted-surface);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}

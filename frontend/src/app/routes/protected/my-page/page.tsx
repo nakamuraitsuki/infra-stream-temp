@@ -2,6 +2,8 @@ import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { MyVideoList } from "@/features/video/list-mine";
+import { IconButton } from "@/ui/IconButton/IconButton";
+import { RiAddLine } from "react-icons/ri";
 
 const MY_PAGE_LIMIT = 10;
 
@@ -22,14 +24,15 @@ export const MyPage = () => {
       <h2>My Page</h2>
       <p>Welcome, {session.user?.name}!</p>
 
-
-      <p>アップロード</p>
-      <button onClick={() => navigate("/upload")}>
-        Upload New Video
-      </button>
+      <IconButton
+        icon={<RiAddLine size={20} />}
+        onClick={() => navigate("/upload")}
+        label="Create New Video"
+        ariaLabel="Upload New Video"
+      />
       <hr />
 
-      <h2>My Videos</h2>
+      <h3>My Videos</h3>
       <MyVideoList
         limit={MY_PAGE_LIMIT}
         onSelect={(id) => navigate(`/video/${id}`)}
