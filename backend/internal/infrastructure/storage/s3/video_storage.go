@@ -20,10 +20,10 @@ type videoStorage struct {
 	bucketName    string
 }
 
-func NewVideoStorage(client *s3.Client, cfg Config) video.Storage {
+func NewVideoStorage(clientSet *S3ClientSet, cfg Config) video.Storage {
 	return &videoStorage{
-		client:        client,
-		presignClient: s3.NewPresignClient(client),
+		client:        clientSet.Client,
+		presignClient: clientSet.PresignClient,
 		bucketName:    cfg.BucketName,
 	}
 }

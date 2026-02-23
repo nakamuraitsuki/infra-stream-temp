@@ -11,7 +11,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
-func NewClient(ctx context.Context, cfg Config) (*s3.Client, error) {
+type S3ClientSet struct {
+    Client        *s3.Client
+    PresignClient *s3.PresignClient
+}
+
+func NewClient(ctx context.Context, cfg Config) (*S3ClientSet, error) {
 	awsCfg, err := config.LoadDefaultConfig(ctx,
 		config.WithRegion(cfg.Region),
 		config.WithCredentialsProvider(
@@ -33,6 +38,14 @@ func NewClient(ctx context.Context, cfg Config) (*s3.Client, error) {
 		o.UsePathStyle = cfg.UsePathStyle
 	})
 
+	presignS3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
+		if cfg.PublicEndpoint != "" {
+			o.BaseEndpoint = aws.String(cfg.PublicEndpoint)
+		}
+		o.UsePathStyle = cfg.UsePathStyle
+	})
+	presignClient := s3.NewPresignClient(presignS3Client)
+
 	_, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
 		Bucket: aws.String(cfg.BucketName),
 	})
@@ -43,28 +56,9 @@ func NewClient(ctx context.Context, cfg Config) (*s3.Client, error) {
 			return nil, err
 		}
 	}
-	if err := applyCORS(ctx, client, cfg.BucketName); err != nil {
-		return nil, err
-	}
 
-	return client, nil
-}
-
-// helper function to CORS
-func applyCORS(ctx context.Context, client *s3.Client, bucketName string) error {
-	_, err := client.PutBucketCors(ctx, &s3.PutBucketCorsInput{
-		Bucket: aws.String(bucketName),
-		CORSConfiguration: &types.CORSConfiguration{
-			CORSRules: []types.CORSRule{
-				{
-					AllowedOrigins: []string{"*"},
-					AllowedMethods: []string{"GET", "PUT", "POST", "DELETE", "HEAD"},
-					AllowedHeaders: []string{"*"},
-					ExposeHeaders:  []string{"ETag"},
-					MaxAgeSeconds:  aws.Int32(3000),
-				},
-			},
-		},
-	})
-	return err
+	return &S3ClientSet{
+		Client:        client,
+		PresignClient: presignClient,
+	}, nil
 }

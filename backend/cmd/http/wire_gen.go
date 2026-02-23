@@ -36,16 +36,16 @@ func InitializeHTTPServer() (*HTTPServerApp, error) {
 	repository := user.NewRepository(db)
 	context := provideContext()
 	s3Config := s3.NewS3Config()
-	client, err := s3.NewClient(context, s3Config)
+	s3ClientSet, err := s3.NewClient(context, s3Config)
 	if err != nil {
 		return nil, err
 	}
-	iconStorage := s3.NewIconStorage(client, s3Config)
+	iconStorage := s3.NewIconStorage(s3ClientSet, s3Config)
 	userUseCaseInterface := user2.NewUserUseCase(repository, iconStorage)
 	handler := user3.NewHandler(userUseCaseInterface)
 	videoRepository := video.NewRepository(db)
 	outboxRepository := outbox.NewRepository(db)
-	storage := s3.NewVideoStorage(client, s3Config)
+	storage := s3.NewVideoStorage(s3ClientSet, s3Config)
 	transcoder := ffmpeg.NewFFmpegTranscoder(storage)
 	unitOfWork := postgres.NewTransactor(db)
 	videoManagementUseCaseInterface := manage.NewVideoManagementUseCase(videoRepository, outboxRepository, storage, transcoder, unitOfWork)

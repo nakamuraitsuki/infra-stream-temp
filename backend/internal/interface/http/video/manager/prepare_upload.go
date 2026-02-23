@@ -27,18 +27,12 @@ func (h *VideoManagementHandler) PrepareUpload(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid video ID: "+err.Error())
 	}
 
-	file, err := c.FormFile("file")
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "failed to get uploaded file: "+err.Error())
+	var req UploadSourceRequest
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body: "+err.Error())
 	}
 
-	src, err := file.Open()
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to open uploaded file: "+err.Error())
-	}
-	defer src.Close()
-
-	result, err := h.manageUsecase.PrepareUploadSession(ctx, videoID, file.Size)
+	result, err := h.manageUsecase.PrepareUploadSession(ctx, videoID, req.FileSize)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prepare upload session: "+err.Error())
 	}
