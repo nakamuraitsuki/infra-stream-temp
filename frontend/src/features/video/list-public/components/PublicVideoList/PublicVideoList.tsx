@@ -1,6 +1,6 @@
 import type { Video, VideoId } from "@/domain/video/video.model";
-import { usePublicVideosQuery } from "../hooks/usePublicVideosQuery";
-import { PublicVideoCard } from "./PublicVideoCard";
+import { usePublicVideosQuery } from "../../hooks/usePublicVideosQuery";
+import { PublicVideoCard } from "../PublicVideoCard/PublicVideoCard";
 import styles from "./PublicVideoList.module.css";
 
 type Props = {

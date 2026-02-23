@@ -1,7 +1,7 @@
 import type { Video, VideoId } from "@/domain/video/video.model"
-import { VideoThumbnailCanvas } from "../../thumbnail";
+import { VideoThumbnailCanvas } from "@/features/video/thumbnail";
 import styles from "./MyVideoCard.module.css";
-import { VideoStatusChip } from "./VideoStatusChip";
+import { VideoStatusChip } from "../../../ui/Chip/VideoStatusChip";
 
 type Props = {
   video: Video;
@@ -21,9 +21,9 @@ export const MyVideoCard = ({ video, onClick }: Props) => {
         />
       </div>
       <div className={styles.cardBody}>
-        { video.status ? (
+        {video.status ? (
           <VideoStatusChip status={video.status} isPublic={video.visibility === "public"} />
-        ): null }
+        ) : null}
         <div className={styles.meta}>
           <h3 className={styles.title}>{video.title}</h3>
           <span className={styles.description}>{video.description}</span>

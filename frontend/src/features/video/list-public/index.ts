@@ -1,1 +1,1 @@
-export { PublicVideoList } from "./components/PublicVideoList";
+export { PublicVideoList } from "./components/PublicVideoList/PublicVideoList";

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
-import { MyVideoList } from "@/features/video/list-mine/components/MyVideoList";
+import { MyVideoList } from "@/features/video/list-mine";
 
 const MY_PAGE_LIMIT = 10;
 
@@ -22,13 +22,14 @@ export const MyPage = () => {
       <h2>My Page</h2>
       <p>Welcome, {session.user?.name}!</p>
 
-      <hr />
 
       <p>アップロード</p>
       <button onClick={() => navigate("/upload")}>
         Upload New Video
       </button>
+      <hr />
 
+      <h2>My Videos</h2>
       <MyVideoList
         limit={MY_PAGE_LIMIT}
         onSelect={(id) => navigate(`/video/${id}`)}

@@ -1,8 +1,8 @@
 import type { Video, VideoId } from "@/domain/video/video.model";
-import { useMyVideosQuery } from "../hooks/useMyVideosQuery";
+import { useMyVideosQuery } from "../../hooks/useMyVideosQuery";
 import styles from "./MyVideoList.module.css";
-import { MyVideoCard } from "./MyVideoCard";
-import { Spinner } from "@/ui/Spinner";
+import { MyVideoCard } from "../MyVideoCard/MyVideoCard";
+import { Spinner } from "@/ui/Spinner/Spinner";
 
 type Props = {
   limit?: number;

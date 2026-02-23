@@ -1,6 +1,6 @@
 import type { Video, VideoId } from "@/domain/video/video.model"
 import styles from "./PublicVideoCard.module.css";
-import { VideoThumbnailCanvas } from "../../thumbnail";
+import { VideoThumbnailCanvas } from "@/features/video/thumbnail";
 
 type Props = {
   video: Video;
