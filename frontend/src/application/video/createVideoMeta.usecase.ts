@@ -22,7 +22,7 @@ export interface ICreateVideoMetaUseCase {
   execute(params: CreateVideoMetaParams): Promise<CreateVideoMetaResult>;
 }
 
-export const createVideoMetaUseCase =
+export const createVideoMeta =
   ({ session, videoRepo }: CreateVideoMetaDeps): ICreateVideoMetaUseCase => ({
     execute: async ({ title, description, tags }) => {
       if (!session) {

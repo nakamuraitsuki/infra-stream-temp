@@ -12,6 +12,7 @@ export type UploadVideoSourceDeps = {
 export type UploadVideoSourceParams = {
   videoId: VideoId;
   file: File;
+  onProgress?: (progress: number) => void;
 }
 
 export interface IUploadVideoSourceUseCase {
@@ -20,8 +21,8 @@ export interface IUploadVideoSourceUseCase {
 
 export const uploadVideoSource =
   ({ videoRepo }: UploadVideoSourceDeps): IUploadVideoSourceUseCase => ({
-    execute: async ({ videoId, file }) => {
-      const res = await videoRepo.uploadSource(videoId, file);
+    execute: async ({ videoId, file, onProgress }) => {
+      const res = await videoRepo.uploadSource(videoId, file, onProgress);
 
       if (!res.success) {
         return { type: "upload_failed", error: res.error };
