@@ -1,0 +1,28 @@
+.chip {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.readyPublic {
+  border-color: green;
+  color: green;
+}
+
+.readyPrivate {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.failed {
+  border-color: red;
+  color: red;
+}
+
+.processing {
+  border-color: gray;
+  color: gray;
+}
