@@ -1,9 +1,10 @@
 import style from "./IconButton.module.css";
 
 type IconButtonProps = {
+  type?: "button" | "submit" | "reset";
   icon: React.ReactNode;
   label?: string;
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
   ariaLabel?: string;
 }
@@ -14,10 +15,12 @@ export const IconButton = ({
   onClick,
   disabled = false,
   ariaLabel,
+  type = "button",
 }: IconButtonProps) => {
   const buttonStyle =  disabled ? style.buttonDisabled : style.button;
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={buttonStyle}

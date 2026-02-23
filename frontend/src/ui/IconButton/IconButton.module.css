@@ -28,6 +28,7 @@
   background-color: var(--color-muted-surface);
   color: var(--color-text-secondary);
   cursor: not-allowed;
+    border-radius: 9999px;
   opacity: 0.6;
 }
 
