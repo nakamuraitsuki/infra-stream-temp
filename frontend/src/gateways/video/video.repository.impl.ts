@@ -4,6 +4,7 @@ import type { VideoId, Video, VideoTag, VideoStatus, VideoVisibility } from "../
 import type { GetPlaybackInfoResponse, IVideoRepository, VideoError } from "../../domain/video/video.repository";
 import { failure, success, type Result } from "../../domain/core/result";
 import { parseFindByTagResponse, parseFindMyVideosResponse, parseListPublicResponse } from "./video.dto";
+import pLimit from "p-limit";
 
 export class VideoRepositoryImpl implements IVideoRepository {
   // helper method to map axios errors to VideoError
@@ -82,8 +83,8 @@ export class VideoRepositoryImpl implements IVideoRepository {
         status: item.status as VideoStatus,
         visibility: item.visibility as VideoVisibility,
         createdAt: new Date(item.createdAt),
-    }));
-  } catch (error) {
+      }));
+    } catch (error) {
       console.error("Failed to fetch my videos:", error);
       return [];
     }
@@ -113,16 +114,82 @@ export class VideoRepositoryImpl implements IVideoRepository {
     }
   }
 
-  async uploadSource(id: VideoId, file: File): Promise<Result<void, VideoError>> {
-    const formdata = new FormData();
-    formdata.append("file", file);
-
+  async uploadSource(id: VideoId, file: File, onProgress: (progress: number) => void): Promise<Result<void, VideoError>> {
+    const PROMISE_LIMIT = 3; // 並列アップロードの同時数
     try {
-      await apiClient.post(`/api/videos/${id}/source`, formdata, {
-        timeout: 0, // アップロードは時間がかかる可能性があるため、タイムアウトを無効化
+      // initialize upload session
+      const { data: initData } = await apiClient.post<{
+        uploadId: string;
+        urls: string[];
+        partSize: number;
+        key: string;
+      }>(`/api/videos/${id}/upload/init`, {
+        fileSize: file.size,
       });
+
+      const { uploadId, urls, partSize } = initData;
+
+      const uploadedBytes = new Array(urls.length).fill(0);
+
+      const updateTotalProgress = () => {
+        const totalUploaded = uploadedBytes.reduce((acc, curr) => acc + curr, 0);
+        const progress = Math.floor((totalUploaded / file.size) * 100);
+        onProgress(progress);
+      };
+
+      // 並列アップロードの同時数を制限
+      const limit = pLimit(PROMISE_LIMIT);
+
+      // upload parts in parallel
+      const uploadPromises = urls.map(async (url, index) => {
+        return limit(async () => {
+          const partNumber = index + 1;
+          const start = index * partSize;
+          const end = Math.min(start + partSize, file.size);
+          const chunk = file.slice(start, end);
+
+          let lastError: any;
+          // ナイーブにリトライを3回試みる
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              const response = await axios.put(url, chunk, {
+                headers: { "Content-Type": file.type || "video/mp4" },
+                // axios の標準機能でパーツごとの進捗を取得
+                onUploadProgress: (progressEvent) => {
+                  uploadedBytes[index] = progressEvent.loaded;
+                  updateTotalProgress();
+                },
+              });
+
+              const etag = response.headers.etag;
+              if (!etag) throw new Error("ETag missing");
+
+              // 成功したら早期リターン
+              return {
+                partNumber: partNumber,
+                etag: etag.replace(/"/g, ""),
+              };
+            } catch (err) {
+              lastError = err;
+              console.warn(`Part ${partNumber} upload attempt ${attempt} failed. Retrying...`);
+              // リトライ前に少し待機 (指数バックオフ)
+              if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            }
+          }
+          throw lastError;
+        });
+      });
+
+      const results = await Promise.all(uploadPromises);
+
+      await apiClient.post(`/api/videos/${id}/upload/complete`, {
+        uploadId: uploadId,
+        parts: results.sort((a, b) => a.partNumber - b.partNumber),
+      });
+
       return success(undefined);
     } catch (error) {
+      console.error("Multipart upload failed:", error);
       return failure(this.handleError(error));
     }
   }
