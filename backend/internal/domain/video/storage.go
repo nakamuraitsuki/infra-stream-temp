@@ -31,7 +31,7 @@ type Storage interface {
 	StartUploadSession(ctx context.Context, key string) (string, error)
 
 	// アップロードURLの生成。セッションIDとパート番号を指定して、アップロードURLを取得する。
-	GenerateUploadURL(ctx context.Context, key string, sessionId string, partNum int) (string, error)
+	GenerateUploadPartURL(ctx context.Context, key string, sessionId string, partNum int32) (string, error)
 
 	// アプロードセッションの完了
 	CommitUploadSession(ctx context.Context, key string, sessionId string, parts []PartInfo) error
