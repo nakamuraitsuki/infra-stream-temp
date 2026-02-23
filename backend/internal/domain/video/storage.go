@@ -20,9 +20,21 @@ type ObjectMeta struct {
 	LastModified  time.Time
 }
 
+type PartInfo struct {
+	PartNumber int32
+	ID         string
+}
+
 type Storage interface {
 	// 元動画の保存（外部アップロード）
-	SaveSource(ctx context.Context, sourceKey string, data io.Reader) error
+	// アップロードセッションを開始。セッションのIDを返す。
+	StartUploadSession(ctx context.Context, key string) (string, error)
+
+	// アップロードURLの生成。セッションIDとパート番号を指定して、アップロードURLを取得する。
+	GenerateUploadURL(ctx context.Context, key string, sessionId string, partNum int) (string, error)
+
+	// アプロードセッションの完了
+	CommitUploadSession(ctx context.Context, key string, sessionId string, parts []PartInfo) error
 
 	// 変換後動画の保存（Transcodeプロセスからのアップロード）
 	SaveStream(ctx context.Context, streamKey string, data io.Reader) error
