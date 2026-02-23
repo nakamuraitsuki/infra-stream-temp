@@ -115,9 +115,8 @@ export class VideoRepositoryImpl implements IVideoRepository {
   }
 
   async uploadSource(id: VideoId, file: File, onProgress: (progress: number) => void): Promise<Result<void, VideoError>> {
-    const PROMISE_LIMIT = 3; // 並列アップロードの同時数
+    const PROMISE_LIMIT = 3;
     try {
-      // initialize upload session
       const { data: initData } = await apiClient.post<{
         uploadId: string;
         urls: string[];
@@ -129,34 +128,48 @@ export class VideoRepositoryImpl implements IVideoRepository {
 
       const { uploadId, urls, partSize } = initData;
 
+      // 各パーツの正確な期待サイズを事前計算（進捗反映のため）
+      const partExpectedSizes = urls.map((_, index) => {
+        const start = index * partSize;
+        const end = Math.min(start + partSize, file.size);
+        return end - start;
+      });
+
+      // 各パーツの現在のアップロード済みバイト数
       const uploadedBytes = new Array(urls.length).fill(0);
 
-      const updateTotalProgress = () => {
+      const updateTotalProgress = (forceComplete = false) => {
+        if (forceComplete) {
+          onProgress(100);
+          return;
+        }
         const totalUploaded = uploadedBytes.reduce((acc, curr) => acc + curr, 0);
-        const progress = Math.floor((totalUploaded / file.size) * 100);
+        const progress = Math.min(99, Math.floor((totalUploaded / file.size) * 100));
         onProgress(progress);
       };
 
-      // 並列アップロードの同時数を制限
       const limit = pLimit(PROMISE_LIMIT);
 
-      // upload parts in parallel
       const uploadPromises = urls.map(async (url, index) => {
         return limit(async () => {
           const partNumber = index + 1;
           const start = index * partSize;
           const end = Math.min(start + partSize, file.size);
           const chunk = file.slice(start, end);
+          const expectedSize = partExpectedSizes[index];
 
           let lastError: any;
-          // ナイーブにリトライを3回試みる
           for (let attempt = 1; attempt <= 3; attempt++) {
             try {
+              // リトライ時はパーツの進捗を一旦0にリセットして計算（進捗反映のため）
+              uploadedBytes[index] = 0;
+              updateTotalProgress();
+
               const response = await axios.put(url, chunk, {
                 headers: { "Content-Type": file.type || "video/mp4" },
-                // axios の標準機能でパーツごとの進捗を取得
                 onUploadProgress: (progressEvent) => {
-                  uploadedBytes[index] = progressEvent.loaded;
+                  // Axiosの進捗が期待サイズを超えないようガードしつつ記録
+                  uploadedBytes[index] = Math.min(progressEvent.loaded, expectedSize);
                   updateTotalProgress();
                 },
               });
@@ -164,15 +177,16 @@ export class VideoRepositoryImpl implements IVideoRepository {
               const etag = response.headers.etag;
               if (!etag) throw new Error("ETag missing");
 
-              // 成功したら早期リターン
+              // 成功時は確実にそのパーツ分をフルカウント
+              uploadedBytes[index] = expectedSize;
+              updateTotalProgress();
+
               return {
                 partNumber: partNumber,
                 etag: etag.replace(/"/g, ""),
               };
             } catch (err) {
               lastError = err;
-              console.warn(`Part ${partNumber} upload attempt ${attempt} failed. Retrying...`);
-              // リトライ前に少し待機 (指数バックオフ)
               if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
             }
           }
@@ -181,6 +195,9 @@ export class VideoRepositoryImpl implements IVideoRepository {
       });
 
       const results = await Promise.all(uploadPromises);
+
+      // サーバー側の結合処理(complete)を呼ぶ前に100%を表示
+      updateTotalProgress(true);
 
       await apiClient.post(`/api/videos/${id}/upload/complete`, {
         uploadId: uploadId,
