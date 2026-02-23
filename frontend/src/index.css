@@ -9,7 +9,7 @@
   /* Background */
   --color-bg: #ffffff;
   --color-surface: #f8f8f8;
-  --color-mutex-surface: #f1f3f5;
+  --color-muted-surface: #f1f3f5;
 
   /* Overlay */
   --color-overlay: rgba(0, 0, 0, 0.3);
