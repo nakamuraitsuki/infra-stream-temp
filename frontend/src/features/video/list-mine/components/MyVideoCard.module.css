@@ -29,3 +29,10 @@
   line-height: 1.2;
   color: var(--color-text-primary);
 }
+
+.description {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  color: var(--color-text-secondary);
+}
