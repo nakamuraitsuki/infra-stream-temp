@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useCreateVideoMutation } from "../hooks/useCreateVideoMutation";
+import { useCreateVideoMutation } from "../../hooks/useCreateVideoMutation";
 import styles from "./VideoUploadForm.module.css";
 import { IconButton } from "@/ui/IconButton/IconButton";
 import { BiArrowBack } from "react-icons/bi";
@@ -19,7 +19,7 @@ type Props = {
 
 export const VideoUploadForm = ({ onSuccess, onBack }: Props) => {
   const { mutate, isPending, progress, error: apiError } = useCreateVideoMutation();
-  
+
   const {
     register,
     handleSubmit,
@@ -27,7 +27,7 @@ export const VideoUploadForm = ({ onSuccess, onBack }: Props) => {
   } = useForm<FormValues>({
     mode: "onChange",
   });
-  
+
   // よくあるページ移動に対する警告
   useEffect(() => {
     if (!isPending) return;
@@ -98,7 +98,8 @@ export const VideoUploadForm = ({ onSuccess, onBack }: Props) => {
             type="file"
             accept="video/*"
             {...register("videoFile", {
-              required: "Video file is required"})}
+              required: "Video file is required"
+            })}
             disabled={isPending}
             className={styles.fileInput}
           />
@@ -109,8 +110,8 @@ export const VideoUploadForm = ({ onSuccess, onBack }: Props) => {
           <div className={styles.progressSection}>
             <div className={styles.progressBarContainer}>
               <div
-              className={styles.progressBar}
-              style={ { width: `${progress}%` } }
+                className={styles.progressBar}
+                style={{ width: `${progress}%` }}
               />
             </div>
             <p className={styles.progressLabel}>

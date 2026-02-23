@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { VideoUploadForm } from "@/features/video/create/components/VideoUploadForm";
+import { VideoUploadForm } from "@/features/video/create/components/VideoUploadForm/VideoUploadForm";
 import styles from "./page.module.css";
 
 export const VideoUploadPage = () => {
