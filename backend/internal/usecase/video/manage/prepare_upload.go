@@ -44,7 +44,7 @@ func (uc *VideoManagementUseCase) PrepareUploadSession(
 	}
 
 	urls := make([]string, partCount)
-	for i:= int32(1); i <= partCount; i++ {
+	for i := int32(1); i <= partCount; i++ {
 		url, err := uc.Storage.GenerateUploadPartURL(
 			ctx,
 			sourceKey,
