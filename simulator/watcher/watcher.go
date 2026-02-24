@@ -28,7 +28,7 @@ type PlaybackInfoResponse struct {
 }
 
 func SimulateWatcher(ctx context.Context, id int, baseURL string) error {
-	client := &http.Client{Timeout: 60 * time.Second}
+	client := &http.Client{Timeout: 20 * time.Second}
 
 	// get public videos
 	getPublicParams := map[string]string{"limit": "10"}
