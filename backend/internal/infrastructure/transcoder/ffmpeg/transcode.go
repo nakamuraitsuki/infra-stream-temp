@@ -79,7 +79,7 @@ func (t *ffmpegTranscoder) Transcode(
 				"-f", "hls",
 				"-hls_time", "6",
 				"-hls_playlist_type", "vod",
-				"-hls_flags", "temp_file",
+				"-hls_flags", "temp_file+independent_segments",
 				"-hls_segment_filename", segmentPattern,
 				playlistPath,
 			)
