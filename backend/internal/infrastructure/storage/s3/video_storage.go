@@ -15,19 +15,74 @@ import (
 )
 
 type videoStorage struct {
-	client     *s3.Client
-	bucketName string
+	client        *s3.Client
+	presignClient *s3.PresignClient
+	bucketName    string
 }
 
-func NewVideoStorage(client *s3.Client, cfg Config) video.Storage {
+func NewVideoStorage(clientSet *S3ClientSet, cfg Config) video.Storage {
 	return &videoStorage{
-		client:     client,
-		bucketName: cfg.BucketName,
+		client:        clientSet.Client,
+		presignClient: clientSet.PresignClient,
+		bucketName:    cfg.BucketName,
 	}
 }
 
-func (s *videoStorage) SaveSource(ctx context.Context, sourceKey string, data io.Reader) error {
-	return s.upload(ctx, sourceKey, data, "video/mp4")
+func (s *videoStorage) StartUploadSession(ctx context.Context, key string) (string, error) {
+	out, err := s.client.CreateMultipartUpload(ctx, &s3.CreateMultipartUploadInput{
+		Bucket:      aws.String(s.bucketName),
+		Key:         aws.String(key),
+		ContentType: aws.String("video/mp4"),
+	})
+	if err != nil {
+		return "", err
+	}
+	return aws.ToString(out.UploadId), nil
+}
+
+func (s *videoStorage) GenerateUploadPartURL(
+	ctx context.Context,
+	key string,
+	sessionID string,
+	partNumber int32,
+) (string, error) {
+	// NOTE: 有効期限15分の署名付きURLを生成
+	presignedReq, err := s.presignClient.PresignUploadPart(ctx, &s3.UploadPartInput{
+		Bucket:     aws.String(s.bucketName),
+		Key:        aws.String(key),
+		UploadId:   aws.String(sessionID),
+		PartNumber: aws.Int32(partNumber),
+	}, s3.WithPresignExpires(15*time.Minute))
+
+	if err != nil {
+		return "", err
+	}
+	return presignedReq.URL, nil
+}
+
+func (s *videoStorage) CommitUploadSession(
+	ctx context.Context,
+	key string,
+	sessionID string,
+	parts []video.PartInfo,
+) error {
+	completedParts := make([]types.CompletedPart, len(parts))
+	for i, p := range parts {
+		completedParts[i] = types.CompletedPart{
+			ETag:       aws.String(p.ID), // IDはETagとして扱う
+			PartNumber: aws.Int32(p.PartNumber),
+		}
+	}
+
+	_, err := s.client.CompleteMultipartUpload(ctx, &s3.CompleteMultipartUploadInput{
+		Bucket:   aws.String(s.bucketName),
+		Key:      aws.String(key),
+		UploadId: aws.String(sessionID),
+		MultipartUpload: &types.CompletedMultipartUpload{
+			Parts: completedParts,
+		},
+	})
+	return err
 }
 
 func (s *videoStorage) SaveStream(ctx context.Context, streamKey string, data io.Reader) error {
@@ -36,7 +91,15 @@ func (s *videoStorage) SaveStream(ctx context.Context, streamKey string, data io
 }
 
 func (s *videoStorage) GenerateTemporaryAccessURL(ctx context.Context, streamKey string, expiresDuration time.Duration) (string, error) {
-	return "", fmt.Errorf("GenerateTemporaryAccessURL: not implemented")
+	presignedReq, err := s.presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(streamKey),
+	}, s3.WithPresignExpires(expiresDuration))
+
+	if err != nil {
+		return "", err
+	}
+	return presignedReq.URL, nil
 }
 
 func (s *videoStorage) GetStream(ctx context.Context, streamKey string, byteRange *video.ByteRange) (io.ReadCloser, *video.ObjectMeta, error) {

@@ -19,7 +19,6 @@ func (c *consumer) watcher(
 			log.Println("Watcher received shutdown signal, exiting...")
 			return nil
 		default:
-			log.Println("Waiting for jobs...")
 			res, err := c.client.Universal.BRPopLPush(ctx, c.key, c.processingKey, 5*time.Second).Result()
 			if err != nil {
 				if errors.Is(err, redis.Nil) {

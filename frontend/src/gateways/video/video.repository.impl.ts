@@ -4,6 +4,7 @@ import type { VideoId, Video, VideoTag, VideoStatus, VideoVisibility } from "../
 import type { GetPlaybackInfoResponse, IVideoRepository, VideoError } from "../../domain/video/video.repository";
 import { failure, success, type Result } from "../../domain/core/result";
 import { parseFindByTagResponse, parseFindMyVideosResponse, parseListPublicResponse } from "./video.dto";
+import pLimit from "p-limit";
 
 export class VideoRepositoryImpl implements IVideoRepository {
   // helper method to map axios errors to VideoError
@@ -82,8 +83,8 @@ export class VideoRepositoryImpl implements IVideoRepository {
         status: item.status as VideoStatus,
         visibility: item.visibility as VideoVisibility,
         createdAt: new Date(item.createdAt),
-    }));
-  } catch (error) {
+      }));
+    } catch (error) {
       console.error("Failed to fetch my videos:", error);
       return [];
     }
@@ -113,16 +114,103 @@ export class VideoRepositoryImpl implements IVideoRepository {
     }
   }
 
-  async uploadSource(id: VideoId, file: File): Promise<Result<void, VideoError>> {
-    const formdata = new FormData();
-    formdata.append("file", file);
-
+  async uploadSource(id: VideoId, file: File, onProgress?: (progress: number) => void): Promise<Result<void, VideoError>>;
+  async uploadSource(id: VideoId, file: File, onProgress: (progress: number) => void = () => {}): Promise<Result<void, VideoError>> {
+    const PROMISE_LIMIT = 3;
     try {
-      await apiClient.post(`/api/videos/${id}/source`, formdata, {
-        timeout: 0, // アップロードは時間がかかる可能性があるため、タイムアウトを無効化
+      const { data: initData } = await apiClient.post<{
+        uploadId: string;
+        urls: string[];
+        partSize: number;
+        key: string;
+      }>(`/api/videos/${id}/upload/init`, {
+        fileSize: file.size,
       });
+
+      const { uploadId, urls, partSize } = initData;
+
+      // 各パーツの正確な期待サイズを事前計算（進捗反映のため）
+      const partExpectedSizes = urls.map((_, index) => {
+        const start = index * partSize;
+        const end = Math.min(start + partSize, file.size);
+        return end - start;
+      });
+
+      // 各パーツの現在のアップロード済みバイト数
+      const uploadedBytes = new Array(urls.length).fill(0);
+
+      const updateTotalProgress = (forceComplete = false) => {
+        if (forceComplete) {
+          onProgress(100);
+          return;
+        }
+        const totalUploaded = uploadedBytes.reduce((acc, curr) => acc + curr, 0);
+        const progress = Math.min(99, Math.floor((totalUploaded / file.size) * 100));
+        onProgress(progress);
+      };
+
+      const limit = pLimit(PROMISE_LIMIT);
+
+      const uploadPromises = urls.map(async (url, index) => {
+        return limit(async () => {
+          const partNumber = index + 1;
+          const start = index * partSize;
+          const end = Math.min(start + partSize, file.size);
+          const chunk = file.slice(start, end);
+          const expectedSize = partExpectedSizes[index];
+
+          let lastError: any;
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              // リトライ時はパーツの進捗を一旦0にリセットして計算（進捗反映のため）
+              uploadedBytes[index] = 0;
+              updateTotalProgress();
+
+              const response = await axios.put(url, chunk, {
+                headers: { "Content-Type": file.type || "video/mp4" },
+                onUploadProgress: (progressEvent) => {
+                  // Axiosの進捗が期待サイズを超えないようガードしつつ記録
+                  uploadedBytes[index] = Math.min(progressEvent.loaded, expectedSize);
+                  updateTotalProgress();
+                },
+              });
+
+              const etag = response.headers.etag;
+              if (!etag) throw new Error("ETag missing");
+
+              // 成功時は確実にそのパーツ分をフルカウント
+              uploadedBytes[index] = expectedSize;
+              updateTotalProgress();
+
+              return {
+                partNumber: partNumber,
+                etag: etag.replace(/"/g, ""),
+              };
+            } catch (err) {
+              lastError = err;
+              if (attempt < 3) {
+                const delayMs = Math.pow(2, attempt - 1) * 1000;
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+              }
+            }
+          }
+          throw lastError;
+        });
+      });
+
+      const results = await Promise.all(uploadPromises);
+
+      // サーバー側の結合処理(complete)を呼ぶ前に100%を表示
+      updateTotalProgress(true);
+
+      await apiClient.post(`/api/videos/${id}/upload/complete`, {
+        uploadId: uploadId,
+        parts: results.sort((a, b) => a.partNumber - b.partNumber),
+      });
+
       return success(undefined);
     } catch (error) {
+      console.error("Multipart upload failed:", error);
       return failure(this.handleError(error));
     }
   }

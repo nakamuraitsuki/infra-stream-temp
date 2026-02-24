@@ -2,13 +2,17 @@ package manage
 
 import (
 	"context"
-	"io"
+	"errors"
 
 	"example.com/m/internal/domain/shared"
 	video_domain "example.com/m/internal/domain/video"
 	"example.com/m/internal/usecase/tx"
 	"example.com/m/internal/usecase/video/query"
 	"github.com/google/uuid"
+)
+
+var (
+	ErrFileSizeTooLarge = errors.New("file size is too large")
 )
 
 type VideoManagementUseCaseInterface interface {
@@ -21,9 +25,9 @@ type VideoManagementUseCaseInterface interface {
 		tags []string,
 	) (*CreateResponse, error)
 
-	// UploadAndStartTranscoding uploads the raw video data and starts the transcoding process.
-	UploadAndStartTranscoding(ctx context.Context, videoID uuid.UUID, videoData io.Reader) error
+	PrepareUploadSession(ctx context.Context, videoID uuid.UUID, fileSize int64) (*PrepareUploadResponse, error)
 
+	CompleteUploadSession(ctx context.Context, req CompleteUploadRequest) error
 	// ListMine returns a list of videos owned by the specified user.
 	ListMine(ctx context.Context, ownerID uuid.UUID, query query.VideoSearchQuery) (*ListMineResults, error)
 }

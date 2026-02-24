@@ -42,13 +42,13 @@ func main() {
 		panic(err)
 	}
 	defer postgresClient.Close()
-	s3Client, err := s3.NewClient(context.Background(), s3Cfg)
+	s3ClientSet, err := s3.NewClient(context.Background(), s3Cfg)
 	if err != nil {
 		panic(err)
 	}
 
 	// -- Domain Services --
-	videoStorage := s3.NewVideoStorage(s3Client, s3Cfg)
+	videoStorage := s3.NewVideoStorage(s3ClientSet, s3Cfg)
 	transcoder := ffmpeg.NewFFmpegTranscoder(videoStorage)
 
 	// -- Repositories --
