@@ -12,11 +12,10 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -ldflags="-s -w" -o app-http ./cmd/http
 
 # Runtime Stage
-FROM gcr.io/distroless/base-debian12
+FROM alpine:3.19
 WORKDIR /app
+RUN apk add --no-cache iproute2
 COPY --from=builder /app/app-http .
 EXPOSE 8080
-
-USER nonroot:nonroot
 
 ENTRYPOINT [ "/app/app-http" ]

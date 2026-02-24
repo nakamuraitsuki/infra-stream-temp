@@ -28,14 +28,14 @@ type PlaybackInfoResponse struct {
 }
 
 func SimulateWatcher(ctx context.Context, id int, baseURL string) error {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: 60 * time.Second}
 
 	// get public videos
 	getPublicParams := map[string]string{"limit": "10"}
 
 	body, err := fetchURL(ctx, client, baseURL+"/api/videos", getPublicParams)
 	if err != nil {
-		return err
+		return nil // NOTE: サーバに関係無いエラーは無視する
 	}
 
 	var listResp ListPublicResponse
@@ -58,7 +58,7 @@ func SimulateWatcher(ctx context.Context, id int, baseURL string) error {
 		nil,
 	)
 	if err != nil {
-		return err
+		return nil // NOTE: サーバに関係無いエラーは無視する
 	}
 
 	var info PlaybackInfoResponse

@@ -12,20 +12,27 @@ services:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+    cap_add:
+      - NET_ADMIN
     deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
       resources:
+      # NOTE: 演習のための極限的な制限
+      # 実際の運用では適切な分量を与えるべき
         limits:
           cpus: 0.01
-          memory: 6M
+          memory: 128M
     container_name: http-backend
     env_file:
       - ./backend/.env
     networks:
       - internal
     restart: unless-stopped
+    # NOTE: 帯域リソースを現実的なラインに絞る
+    entrypoint: >
+      /bin/sh -c "
+      tc qdisc add dev eth0 root tbf rate 100mbit burst 32kbit latency 400ms &&
+      ./app-http
+      "
 
   backend-worker:
     build:
@@ -154,7 +161,7 @@ services:
       frontend:
         condition: service_started
     environment:
-      - MAX_WORKERS=3
+      - MAX_WORKERS=7
       - BASE_URL=http://frontend
     networks:
       - internal
