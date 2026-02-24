@@ -9,7 +9,7 @@ export const VideoUploadPage = () => {
     <div className={styles.container}>
       <VideoUploadForm
         onBack={() => navigate(-1)}
-        onSuccess={() => navigate("/my")}
+        onSuccess={() => navigate("/my-page")}
       />
     </div>
   );
