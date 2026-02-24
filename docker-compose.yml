@@ -4,12 +4,23 @@ services:
       context: ./backend
       dockerfile: Dockerfile.http
     depends_on:
-      - minio
-      - postgres
-      - redis
-    cpus: 0.01
-    mem_limit: 6m
-    container_name: app-backend-http
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: 0.01
+          memory: 6M
+    container_name: http-backend
     env_file:
       - ./backend/.env
     networks:
@@ -21,12 +32,24 @@ services:
       context: ./backend
       dockerfile: Dockerfile.worker
     depends_on:
-      - minio
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: 2.0
+          memory: 512M
     cpuset: "0-1"
-    mem_limit: 8g
-    container_name: app-backend-worker
+    container_name: worker-backend
     env_file:
       - ./backend/.env
     networks:
@@ -35,7 +58,7 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: app-frontend
+    container_name: frontend
     ports:
       - "80:80"
     depends_on:
@@ -45,7 +68,7 @@ services:
     restart: unless-stopped
   postgres:
     image: postgres:16-alpine
-    container_name: app-postgres
+    container_name: db-postgres
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: password
@@ -54,19 +77,29 @@ services:
       - pgdata:/var/lib/postgresql/data
       # cf. https://hub.docker.com/_/postgres#initialization-scripts
       - ./backend/deployments/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d appdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - internal
     restart: unless-stopped
   redis:
     image: redis:7-alpine
-    container_name: app-redis
+    container_name: queue-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - internal
     restart: unless-stopped
 
   minio:
     image: minio/minio:latest
-    container_name: app-minio
+    container_name: storage-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minio
@@ -76,6 +109,11 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - internal
     restart: unless-stopped
@@ -84,27 +122,25 @@ services:
     image: minio/mc:latest
     container_name: app-minio-init
     depends_on:
-      - minio
+      minio:
+        condition: service_healthy
     env_file:
       - ./backend/.env
     networks:
       - internal
     entrypoint: >
       /bin/sh -c "
-      # 環境変数を使って alias を設定
-      until (/usr/bin/mc alias set myminio http://minio:9000 $${S3_ACCESS_KEY} $${S3_SECRET_KEY}) do 
-        echo 'Waiting for MinIO...' && sleep 1; 
+      echo 'Waiting for MinIO...';
+      while ! /usr/bin/mc alias set myminio http://minio:9000 $${S3_ACCESS_KEY} $${S3_SECRET_KEY} > /dev/null 2>&1; do
+        sleep 1;
       done;
-      
-      # バケットの作成
+
       /usr/bin/mc mb --ignore-existing myminio/$${S3_BUCKET};
-      
-      # CORS設定
-      echo \"{\\\"CORSRules\\\": [{\\\"AllowedOrigins\\\": [\\\"*\\\"], \\\"AllowedMethods\\\": [\\\"GET\\\",\\\"PUT\\\",\\\"POST\\\",\\\"HEAD\\\"], \\\"AllowedHeaders\\\": [\\\"*\\\"], \\\"ExposeHeaders\\\": [\\\"ETag\\\"]}]}\" > /tmp/cors.json;
-      
-      /usr/bin/mc cors set myminio/$${S3_BUCKET} /tmp/cors.json;
-      
-      echo 'MinIO initialization completed for bucket: $${S3_BUCKET}';
+
+      # 標準入力からCORS設定を流し込む（EOFエラー回避）
+      echo '{\"CORSRules\": [{\"AllowedOrigins\": [\"*\"], \"AllowedMethods\": [\"GET\",\"PUT\",\"POST\",\"HEAD\"], \"AllowedHeaders\": [\"*\"], \"ExposeHeaders\": [\"ETag\"]}]}' | /usr/bin/mc cors set myminio/$${S3_BUCKET} /dev/stdin;
+
+      echo 'MinIO initialization completed.';
       exit 0;
       "
 
