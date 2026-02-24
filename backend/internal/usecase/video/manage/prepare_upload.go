@@ -25,6 +25,7 @@ type PrepareUploadResponse struct {
 	Key      string
 }
 
+// TODO: 実行者が保有者であることの検証を追加する
 func (uc *VideoManagementUseCase) PrepareUploadSession(
 	ctx context.Context,
 	videoID uuid.UUID,

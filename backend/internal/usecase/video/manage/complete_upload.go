@@ -20,6 +20,7 @@ type CompleteUploadRequest struct {
 	Parts    []UploadPart
 }
 
+// TODO: 実行者が保有者であることの検証を追加する
 func (uc *VideoManagementUseCase) CompleteUploadSession(
 	ctx context.Context,
 	req CompleteUploadRequest,
