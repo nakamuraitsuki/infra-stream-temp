@@ -10,6 +10,6 @@ export const LoginPage = () => {
     console.log("Logging in...");
     login("", "");
     navigate("/");
-  }, [])
+  }, [login, navigate])
   return null;
 }
