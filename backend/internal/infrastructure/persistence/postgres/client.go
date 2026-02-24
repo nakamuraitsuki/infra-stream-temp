@@ -16,8 +16,6 @@ type DB interface {
 	SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 }
 
-
-
 func NewClient(cfg Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?sslmode=%s",

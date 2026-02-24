@@ -12,8 +12,8 @@ import (
 )
 
 type S3ClientSet struct {
-    Client        *s3.Client
-    PresignClient *s3.PresignClient
+	Client        *s3.Client
+	PresignClient *s3.PresignClient
 }
 
 func NewClient(ctx context.Context, cfg Config) (*S3ClientSet, error) {

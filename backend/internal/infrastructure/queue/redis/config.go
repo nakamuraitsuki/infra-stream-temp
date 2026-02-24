@@ -4,7 +4,7 @@ import "example.com/m/internal/infrastructure/env"
 
 type Config struct {
 	Host     string
-	Port		 string
+	Port     string
 	Password string
 	DB       int
 }

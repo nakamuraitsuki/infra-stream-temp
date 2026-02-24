@@ -45,7 +45,6 @@ func (uc *VideoManagementUseCase) CompleteUploadSession(
 		return fmt.Errorf("failed to commit upload session: %w", err)
 	}
 
-
 	err = uc.UoW.Do(ctx, func(ctx context.Context) error {
 		video, err := uc.VideoRepo.FindByID(ctx, req.VideoID)
 		if err != nil {
@@ -64,7 +63,7 @@ func (uc *VideoManagementUseCase) CompleteUploadSession(
 			"videos/%s/stream/",
 			req.VideoID.String(),
 		)
-		
+
 		// アップロード完了したら、非同期Workerにジョブを投げていい
 		if err = video.StartTranscoding(streamKey); err != nil {
 			return err
