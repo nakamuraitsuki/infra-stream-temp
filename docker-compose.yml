@@ -55,6 +55,7 @@ services:
     networks:
       - internal
     restart: unless-stopped
+
   frontend:
     build:
       context: ./frontend
@@ -66,6 +67,7 @@ services:
     networks:
       - internal
     restart: unless-stopped
+
   postgres:
     image: postgres:16-alpine
     container_name: db-postgres
@@ -85,6 +87,7 @@ services:
     networks:
       - internal
     restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     container_name: queue-redis
@@ -143,7 +146,24 @@ services:
       echo 'MinIO initialization completed.';
       exit 0;
       "
-
+  simulator:
+    build:
+      context: ./simulator
+    container_name: simulator
+    depends_on:
+      frontend:
+        condition: service_started
+    environment:
+      - MAX_WORKERS=3
+      - BASE_URL=http://frontend
+    networks:
+      - internal
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 128M
 networks:
   internal:
     driver: bridge
