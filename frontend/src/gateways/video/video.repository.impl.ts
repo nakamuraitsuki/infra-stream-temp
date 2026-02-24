@@ -188,7 +188,10 @@ export class VideoRepositoryImpl implements IVideoRepository {
               };
             } catch (err) {
               lastError = err;
-              if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+              if (attempt < 3) {
+                const delayMs = Math.pow(2, attempt - 1) * 1000;
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+              }
             }
           }
           throw lastError;
