@@ -1,5 +1,5 @@
 import type { Result } from "../core/result";
-import type { VideoTag, Video, VideoId } from "./video.model";
+import type { VideoTag, Video, VideoId, VideoVisibility } from "./video.model";
 
 export interface GetPlaybackInfoResponse {
   playbackUrl: string; // Master playlist URL (e.g., HLS)
@@ -18,6 +18,13 @@ export interface IVideoRepository {
     title: string,
     description: string,
     tags: VideoTag[],
+  ): Promise<Result<Video, VideoError>>;
+  update(
+    id: VideoId,
+    title: string,
+    description: string,
+    tags: VideoTag[],
+    visibility: VideoVisibility,
   ): Promise<Result<Video, VideoError>>;
   uploadSource(id: VideoId, file: File, onProgress?: (progress: number) => void): Promise<Result<void, VideoError>>;
 }

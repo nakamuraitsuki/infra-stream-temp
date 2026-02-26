@@ -3,7 +3,7 @@ import { apiClient } from "../../api/client";
 import type { VideoId, Video, VideoTag, VideoStatus, VideoVisibility } from "../../domain/video/video.model";
 import type { GetPlaybackInfoResponse, IVideoRepository, VideoError } from "../../domain/video/video.repository";
 import { failure, success, type Result } from "../../domain/core/result";
-import { parseFindByTagResponse, parseFindMyVideosResponse, parseListPublicResponse } from "./video.dto";
+import { parseFindByTagResponse, parseFindMyVideosResponse, parseListPublicResponse, parseUpdateVideoResponse } from "./video.dto";
 import pLimit from "p-limit";
 
 export class VideoRepositoryImpl implements IVideoRepository {
@@ -96,6 +96,23 @@ export class VideoRepositoryImpl implements IVideoRepository {
         `/api/videos/${id}/playback-info`,
       );
       return success(data);
+    } catch (error) {
+      return failure(this.handleError(error));
+    }
+  }
+
+  async update(id: VideoId, title: string, description: string, tags: VideoTag[], visibility: VideoVisibility): Promise<Result<Video, VideoError>> {
+    try {
+      const { data } = await apiClient.put(`/api/videos/${id}`, { title, description, tags, visibility });
+      const dto = parseUpdateVideoResponse(data);
+      return success({
+        id: dto.id,
+        title: dto.title,
+        description: dto.description,
+        tags: dto.tags as VideoTag[],
+        visibility: dto.visibility as VideoVisibility,
+        createdAt: new Date(dto.createdAt),
+      });
     } catch (error) {
       return failure(this.handleError(error));
     }
