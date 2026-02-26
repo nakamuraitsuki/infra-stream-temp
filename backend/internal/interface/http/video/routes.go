@@ -19,6 +19,7 @@ func RegisterRoutes(g *echo.Group, mh *manager.VideoManagementHandler, vh *viewe
 
 	videos.POST("", mh.Create)
 	videos.GET("/mine", mh.ListMine)
+	videos.PUT("/:id", mh.Update)
 	videos.POST("/:id/upload/init", mh.PrepareUpload)
 	videos.POST("/:id/upload/complete", mh.CompleteUpload)
 }
