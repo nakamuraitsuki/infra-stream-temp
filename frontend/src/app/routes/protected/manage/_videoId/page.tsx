@@ -3,6 +3,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { VideoEditPanel } from "@/features/video/edit";
 import type { Video } from "@/domain/video/video.model";
+import { IconButton } from "@/ui/IconButton/IconButton";
+import { BiArrowBack } from "react-icons/bi";
 
 export const VideoManagePage = () => {
   const navigate = useNavigate();
@@ -23,16 +25,22 @@ export const VideoManagePage = () => {
     return (
       <div style={{ padding: "20px" }}>
         <p>動画情報が見つかりませんでした。</p>
-        <button onClick={() => navigate("/my-page")}>マイページに戻る</button>
+        <IconButton
+          onClick={() => navigate("/my-page")}
+          icon={<BiArrowBack size={20} />}
+          label="マイページに戻る"
+        />
       </div>
     );
   }
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <button onClick={() => navigate("/my-page")} style={{ marginBottom: "16px" }}>
-        ← マイページに戻る
-      </button>
+      <IconButton
+        onClick={() => navigate("/my-page")}
+        icon={<BiArrowBack size={20} />}
+        label="マイページに戻る"
+      />
       <h2 style={{ marginBottom: "24px" }}>{video.title}</h2>
       <VideoEditPanel video={video} />
     </div>
