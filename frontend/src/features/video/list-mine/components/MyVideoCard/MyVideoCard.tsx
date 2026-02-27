@@ -1,18 +1,18 @@
-import type { Video, VideoId } from "@/domain/video/video.model"
+import type { Video } from "@/domain/video/video.model"
 import { VideoThumbnailCanvas } from "@/features/video/thumbnail";
 import styles from "./MyVideoCard.module.css";
 import { VideoStatusChip } from "../../../ui/Chip/VideoStatusChip";
 
 type Props = {
   video: Video;
-  onClick?: (videoId: VideoId) => void;
+  onClick?: (video: Video) => void;
 };
 
 export const MyVideoCard = ({ video, onClick }: Props) => {
   return (
     <div
       className={styles.card}
-      onClick={() => onClick?.(video.id)}
+      onClick={() => onClick?.(video)}
     >
       <div className={styles.thumbnail}>
         <VideoThumbnailCanvas
