@@ -35,7 +35,7 @@ export const MyPage = () => {
       <h3>My Videos</h3>
       <MyVideoList
         limit={MY_PAGE_LIMIT}
-        onSelect={(id) => navigate(`/video/${id}`)}
+        onSelect={(video) => navigate(`/manage/${video.id}`, { state: { video } })}
       />
     </div>
   );
