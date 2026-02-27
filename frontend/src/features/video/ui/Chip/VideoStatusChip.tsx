@@ -9,13 +9,13 @@ type VideoStatusChipProps = {
 export const VideoStatusChip = ({ status, isPublic }: VideoStatusChipProps) => {
   const getLabel = () => {
     if (status === 'ready') return isPublic ? 'Public' : 'Private';
-    if (status === 'failed') return 'Failed';
+    if (status === 'failed' || status === 'initial') return 'Failed';
     return 'Processing';
   };
 
   const getStyle = () => {
     if (status === 'ready') return isPublic ? styles.readyPublic : styles.readyPrivate;
-    if (status === 'failed') return styles.failed;
+    if (status === 'failed' || status === 'initial') return styles.failed;
     return styles.processing;
   };
 
