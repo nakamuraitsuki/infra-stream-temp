@@ -71,3 +71,16 @@ export type FindMyVideosResponseDTO = z.infer<typeof FindMyVideosResponseSchema>
 export const parseFindMyVideosResponse = (data: unknown): FindMyVideosResponseDTO => {
   return FindMyVideosResponseSchema.parse(data);
 }
+
+const UpdateVideoResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  tags: z.array(TagSchema),
+  visibility: VideoVisibilitySchema,
+  createdAt: z.string(), // ISO8601形式の文字列
+});
+export type UpdateVideoResponseDTO = z.infer<typeof UpdateVideoResponseSchema>;
+export const parseUpdateVideoResponse = (data: unknown): UpdateVideoResponseDTO => {
+  return UpdateVideoResponseSchema.parse(data);
+}

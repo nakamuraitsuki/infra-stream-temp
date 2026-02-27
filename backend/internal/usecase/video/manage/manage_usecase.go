@@ -13,6 +13,8 @@ import (
 
 var (
 	ErrFileSizeTooLarge = errors.New("file size is too large")
+	ErrVideoNotFound    = errors.New("video not found")
+	ErrVideoForbidden   = errors.New("video is not accessible")
 )
 
 type VideoManagementUseCaseInterface interface {
@@ -30,6 +32,17 @@ type VideoManagementUseCaseInterface interface {
 	CompleteUploadSession(ctx context.Context, req CompleteUploadRequest) error
 	// ListMine returns a list of videos owned by the specified user.
 	ListMine(ctx context.Context, ownerID uuid.UUID, query query.VideoSearchQuery) (*ListMineResults, error)
+
+	// Update updates the video meta data.
+	Update(
+		ctx context.Context,
+		requesterID uuid.UUID,
+		videoID uuid.UUID,
+		title string,
+		description string,
+		tags []string,
+		visibility string,
+	) (*UpdateResponse, error)
 }
 
 type VideoManagementUseCase struct {

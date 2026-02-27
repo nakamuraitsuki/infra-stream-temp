@@ -149,3 +149,10 @@ func (v *Video) MarkTranscodeFailed(reason value.FailureReason) {
 	v.failureReason = &reason
 	v.retryCount++
 }
+
+func (v *Video) UpdateInfo(title string, description string, tags []value.Tag, visibility value.Visibility) {
+	v.title = title
+	v.description = description
+	v.tags = tags
+	v.visibility = visibility
+}

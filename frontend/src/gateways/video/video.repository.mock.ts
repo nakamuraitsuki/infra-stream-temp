@@ -1,6 +1,6 @@
 import { failure, success, type Result } from "../../domain/core/result";
 import type { UserId } from "../../domain/user/user.model";
-import type { VideoId, Video, VideoTag } from "../../domain/video/video.model";
+import type { VideoId, Video, VideoTag, VideoVisibility } from "../../domain/video/video.model";
 import type { GetPlaybackInfoResponse, IVideoRepository, VideoError } from "../../domain/video/video.repository";
 
 export class VideoRepositoryMock implements IVideoRepository {
@@ -110,5 +110,9 @@ export class VideoRepositoryMock implements IVideoRepository {
 
   async uploadSource(_id: VideoId, _file: File, _onProgress: (progress: number) => void): Promise<Result<void, VideoError>> {
     return failure("UNKNOWN_ERROR"); // 動画アップロードはモックではサポートしない
+  }
+
+  async update(_id: VideoId, _title: string, _description: string, _tags: VideoTag[], _visibility: VideoVisibility): Promise<Result<Video, VideoError>> {
+    return failure("UNKNOWN_ERROR"); // 動画更新はモックではサポートしない
   }
 }
