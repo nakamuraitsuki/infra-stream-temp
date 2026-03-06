@@ -2,7 +2,6 @@ package ffmpeg
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -24,15 +23,6 @@ func (t *ffmpegTranscoder) Transcode(
 	sourceKey string,
 	streamKey string,
 ) error {
-
-	log.Printf("ctx deadline: %v", func() any {
-		d, ok := ctx.Deadline()
-		if !ok {
-			return "none"
-		}
-		return d
-	}())
-
 	tmpDir, err := os.MkdirTemp("", "transcode-*")
 	if err != nil {
 		return err
@@ -44,7 +34,6 @@ func (t *ffmpegTranscoder) Transcode(
 		return err
 	}
 
-	playlistPath := filepath.Join(tmpDir, "index.m3u8")
 	pathCh := make(chan string, PATHS_CHANNEL_BUFFER_SIZE)
 	eg, gCtx := errgroup.WithContext(ctx)
 
@@ -59,41 +48,44 @@ func (t *ffmpegTranscoder) Transcode(
 		// この関数が終わった時点で Ch に詰まれたものだけを処理する
 		defer close(pathCh)
 
-		vEg, vCtx := errgroup.WithContext(gCtx)
-		vCtx, cancel := context.WithCancelCause(vCtx)
-		defer cancel(errors.New("ffmpeg and watcher finished"))
+		playlistPath := filepath.Join(tmpDir, "index.m3u8")
+		segmentPattern := filepath.Join(tmpDir, "segment_%03d.ts")
+		cmd := exec.CommandContext(gCtx, "ffmpeg",
+			"-threads", "1", // 本当は最適割当をしたいが、とりあえず制限
+			"-i", sourcePath,
+			"-c:v", "libx264", "-c:a", "aac",
+			"-f", "hls",
+			"-hls_time", "6",
+			"-hls_playlist_type", "vod",
+			"-hls_flags", "temp_file+independent_segments",
+			"-hls_segment_filename", segmentPattern,
+			playlistPath,
+		)
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("ffmpeg error: %w", err)
+		}
 
-		vEg.Go(func() error {
-			return t.watchAndQueue(vCtx, tmpDir, pathCh)
-		})
+		// まず .ts をすべて探す
+		files, err := filepath.Glob(filepath.Join(tmpDir, "*.ts"))
+		if err != nil {
+			return err
+		}
 
-		vEg.Go(func() error {
-			defer cancel(errors.New("ffmpeg finished")) // ffmpegが終わったらwatcherの loop も終了させる
-			segmentPattern := filepath.Join(tmpDir, "segment_%03d.ts")
-
-			// ffmpeg プロセスのコンテキストには vCtx を直接使用し、上位 ctx のキャンセルでプロセスも終了するようにする
-			cmd := exec.CommandContext(vCtx, "ffmpeg",
-				"-threads", "1", // 本当は最適割当をしたいが、とりあえず制限
-				"-i", sourcePath,
-				"-c:v", "libx264", "-c:a", "aac",
-				"-f", "hls",
-				"-hls_time", "6",
-				"-hls_playlist_type", "vod",
-				"-hls_flags", "temp_file+independent_segments",
-				"-hls_segment_filename", segmentPattern,
-				playlistPath,
-			)
-			cmd.Stderr = os.Stderr
-			cmd.Stdout = os.Stdout
-
-			if err := cmd.Run(); err != nil {
-				return fmt.Errorf("ffmpeg error: %w", err)
+		for _, f := range files {
+			select {
+			case pathCh <- f:
+			case <-gCtx.Done():
+				return err
 			}
+		}
 
-			return nil
-		})
+		select {
+		case pathCh <- playlistPath:
+		case <-gCtx.Done():
+			return err
+		}
 
-		return vEg.Wait()
+		return nil
 	})
 
 	if err := eg.Wait(); err != nil {
@@ -101,14 +93,6 @@ func (t *ffmpegTranscoder) Transcode(
 		deleteCtx := context.WithoutCancel(ctx)
 		_ = t.storage.DeleteStream(deleteCtx, streamKey)
 		return err
-	}
-
-	err = t.uploadFile(ctx, playlistPath, streamKey)
-	if err != nil {
-		// context が終了されている可能性を考慮
-		deleteCtx := context.WithoutCancel(ctx)
-		_ = t.storage.DeleteStream(deleteCtx, streamKey)
-		return fmt.Errorf("failed to upload playlist: %w", err)
 	}
 
 	return nil
